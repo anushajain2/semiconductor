@@ -1,0 +1,45 @@
+{
+  "winners_supported_range": {
+    "small_particles_aligned": 24,
+    "recommended": 21
+  },
+  "winners_all": {
+    "small_particles_aligned": 36,
+    "recommended": 27,
+    "large_particles_aligned": 18
+  },
+  "baseline_ever_wins_supported": false,
+  "indistinguishable_fraction_supported": 1.0,
+  "reversals": [
+    {
+      "a": "large_particles_aligned",
+      "b": "recommended",
+      "between": [
+        1e-06,
+        3e-06
+      ],
+      "crossing_estimate": 1.5030255571165067e-06,
+      "better_below": "recommended"
+    },
+    {
+      "a": "large_particles_aligned",
+      "b": "small_particles_aligned",
+      "between": [
+        1e-06,
+        3e-06
+      ],
+      "crossing_estimate": 1.1219100120382528e-06,
+      "better_below": "small_particles_aligned"
+    },
+    {
+      "a": "recommended",
+      "b": "small_particles_aligned",
+      "between": [
+        3e-07,
+        1e-06
+      ],
+      "crossing_estimate": 6.019187794009623e-07,
+      "better_below": "small_particles_aligned"
+    }
+  ]
+}

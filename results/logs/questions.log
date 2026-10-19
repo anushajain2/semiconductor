@@ -1,0 +1,253 @@
+  [3/30 jobs, 22s]
+  [6/30 jobs, 38s]
+  [9/30 jobs, 50s]
+  [12/30 jobs, 59s]
+  [15/30 jobs, 123s]
+  [18/30 jobs, 182s]
+  [21/30 jobs, 243s]
+  [24/30 jobs, 243s]
+  [27/30 jobs, 243s]
+  [30/30 jobs, 243s]
+  q1q4: 30 jobs, 810 solves, 0 failures, 243s
+  [1/8 jobs, 2s]
+  [2/8 jobs, 2s]
+  [3/8 jobs, 2s]
+  [4/8 jobs, 2s]
+  [5/8 jobs, 3s]
+  [6/8 jobs, 3s]
+  [7/8 jobs, 4s]
+  [8/8 jobs, 4s]
+  q2-t50: 8 jobs, 40 solves, 0 failures, 4s
+  [1/8 jobs, 8s]
+  [2/8 jobs, 8s]
+  [3/8 jobs, 8s]
+  [4/8 jobs, 8s]
+  [5/8 jobs, 13s]
+  [6/8 jobs, 13s]
+  [7/8 jobs, 14s]
+  [8/8 jobs, 14s]
+  q2-t100: 8 jobs, 40 solves, 0 failures, 14s
+  [1/8 jobs, 18s]
+  [2/8 jobs, 18s]
+  [3/8 jobs, 19s]
+  [4/8 jobs, 19s]
+  [5/8 jobs, 36s]
+  [6/8 jobs, 36s]
+  [7/8 jobs, 36s]
+  [8/8 jobs, 36s]
+  q2-t150: 8 jobs, 40 solves, 0 failures, 36s
+  [1/4 jobs, 6s]
+  [2/4 jobs, 6s]
+  [3/4 jobs, 6s]
+  [4/4 jobs, 6s]
+  q2-robin: 4 jobs, 8 solves, 0 failures, 6s
+  [1/8 jobs, 8s]
+  [2/8 jobs, 8s]
+  [3/8 jobs, 8s]
+  [4/8 jobs, 8s]
+  [5/8 jobs, 12s]
+  [6/8 jobs, 13s]
+  [7/8 jobs, 13s]
+  [8/8 jobs, 13s]
+  q3-reference: 8 jobs, 40 solves, 0 failures, 13s
+  [1/4 jobs, 7s]
+  [2/4 jobs, 7s]
+  [3/4 jobs, 8s]
+  [4/4 jobs, 8s]
+  q3-order_minus_0.1: 4 jobs, 20 solves, 0 failures, 8s
+  [1/4 jobs, 7s]
+  [2/4 jobs, 7s]
+  [3/4 jobs, 7s]
+  [4/4 jobs, 7s]
+  q3-order_minus_0.2: 4 jobs, 20 solves, 0 failures, 7s
+  [1/8 jobs, 11s]
+  [2/8 jobs, 11s]
+  [3/8 jobs, 11s]
+  [4/8 jobs, 11s]
+  [5/8 jobs, 22s]
+  [6/8 jobs, 22s]
+  [7/8 jobs, 22s]
+  [8/8 jobs, 22s]
+  q3-d50_x0.8: 8 jobs, 40 solves, 0 failures, 22s
+  [1/8 jobs, 6s]
+  [2/8 jobs, 6s]
+  [3/8 jobs, 6s]
+  [4/8 jobs, 6s]
+  [5/8 jobs, 8s]
+  [6/8 jobs, 10s]
+  [7/8 jobs, 10s]
+  [8/8 jobs, 10s]
+  q3-d50_x1.2: 8 jobs, 40 solves, 0 failures, 10s
+  [1/8 jobs, 5s]
+  [2/8 jobs, 6s]
+  [3/8 jobs, 6s]
+  [4/8 jobs, 6s]
+  [5/8 jobs, 10s]
+  [6/8 jobs, 10s]
+  [7/8 jobs, 11s]
+  [8/8 jobs, 12s]
+  q3-sigma_plus_0.1: 8 jobs, 40 solves, 0 failures, 12s
+  [1/8 jobs, 9s]
+  [2/8 jobs, 9s]
+  [3/8 jobs, 9s]
+  [4/8 jobs, 9s]
+  [5/8 jobs, 13s]
+  [6/8 jobs, 15s]
+  [7/8 jobs, 15s]
+  [8/8 jobs, 15s]
+  q3-min_gap_0.5um: 8 jobs, 40 solves, 0 failures, 15s
+  [1/8 jobs, 8s]
+  [2/8 jobs, 8s]
+  [3/8 jobs, 8s]
+  [4/8 jobs, 8s]
+  [5/8 jobs, 12s]
+  [6/8 jobs, 14s]
+  [7/8 jobs, 14s]
+  [8/8 jobs, 14s]
+  q3-min_gap_2um: 8 jobs, 40 solves, 0 failures, 14s
+  [1/8 jobs, 9s]
+  [2/8 jobs, 9s]
+  [3/8 jobs, 9s]
+  [4/8 jobs, 9s]
+  [5/8 jobs, 14s]
+  [6/8 jobs, 16s]
+  [7/8 jobs, 16s]
+  [8/8 jobs, 16s]
+  q3-margin_1.5um: 8 jobs, 40 solves, 0 failures, 16s
+  [1/8 jobs, 8s]
+  [2/8 jobs, 8s]
+  [3/8 jobs, 8s]
+  [4/8 jobs, 8s]
+  [5/8 jobs, 12s]
+  [6/8 jobs, 13s]
+  [7/8 jobs, 13s]
+  [8/8 jobs, 13s]
+  q3-margin_6um: 8 jobs, 40 solves, 0 failures, 14s
+  [1/8 jobs, 16s]
+  [2/8 jobs, 16s]
+  [3/8 jobs, 16s]
+  [4/8 jobs, 16s]
+  [5/8 jobs, 26s]
+  [6/8 jobs, 28s]
+  [7/8 jobs, 28s]
+  [8/8 jobs, 29s]
+  q3-width_x2: 8 jobs, 40 solves, 0 failures, 29s
+{
+  "q1": {
+    "winners_supported_range": {
+      "small_particles_aligned": 24,
+      "recommended": 21
+    },
+    "winners_all": {
+      "small_particles_aligned": 36,
+      "recommended": 27,
+      "large_particles_aligned": 18
+    },
+    "baseline_ever_wins_supported": false,
+    "indistinguishable_fraction_supported": 1.0,
+    "reversals": [
+      {
+        "a": "large_particles_aligned",
+        "b": "recommended",
+        "between": [
+          1e-06,
+          3e-06
+        ]
+      },
+      {
+        "a": "large_particles_aligned",
+        "b": "small_particles_aligned",
+        "between": [
+          1e-06,
+          3e-06
+        ]
+      },
+      {
+        "a": "recommended",
+        "b": "small_particles_aligned",
+        "between": [
+          3e-07,
+          1e-06
+        ]
+      }
+    ]
+  },
+  "q4": {
+    "recommended": {
+      "total_sd": 8.490807839557935e-06,
+      "mean": 3.260603851290721e-05,
+      "range": 2.399678017665961e-05,
+      "fraction_positive": 1.0,
+      "variance_reduction_orientation_achieved": 0.9812792140363485,
+      "variance_reduction_interface_resistance": 0.016914276526395988,
+      "variance_reduction_filler_conductivity": 8.557150448329498e-05
+    },
+    "small_particles_aligned": {
+      "total_sd": 1.179826869485634e-05,
+      "mean": 3.292472853374507e-05,
+      "range": 3.4570448602325225e-05,
+      "fraction_positive": 1.0,
+      "variance_reduction_orientation_achieved": 0.9720689938498321,
+      "variance_reduction_interface_resistance": 0.02495881178258319,
+      "variance_reduction_filler_conductivity": 3.837056863065236e-05
+    },
+    "large_particles_aligned": {
+      "total_sd": 1.1812794388068324e-05,
+      "mean": 1.988030656254034e-05,
+      "range": 3.798438162953892e-05,
+      "fraction_positive": 1.0,
+      "variance_reduction_orientation_achieved": 0.8886011999903444,
+      "variance_reduction_interface_resistance": 0.11073258935920338,
+      "variance_reduction_filler_conductivity": 1.3469997273141132e-07
+    },
+    "large_minus_small": {
+      "total_sd": 6.042369454876453e-06,
+      "mean": 1.3044421971204726e-05,
+      "range": 2.047454169528274e-05,
+      "fraction_positive": 0.9333333333333333,
+      "variance_reduction_orientation_achieved": 0.07677086004633404,
+      "variance_reduction_interface_resistance": 0.9196347936362612,
+      "variance_reduction_filler_conductivity": 0.00012952031052237967
+    }
+  },
+  "q2": {
+    "contact_total_where_benefit_falls_to": {
+      "0.10": {
+        "50um": {
+          "good_iface_high_kf": 9.820659726702223e-05,
+          "good_iface_low_kf": 9.478143628103453e-05,
+          "nominal": 9.902455368415524e-05,
+          "poor_iface_high_kf": 0.00011531033109542758,
+          "poor_iface_low_kf": 0.00011203598873604008
+        },
+        "100um": {
+          "good_iface_high_kf": 0.00032891242113322324,
+          "good_iface_low_kf": 0.00032200858585128435,
+          "nominal": 0.00033087412915596955,
+          "poor_iface_high_kf": 0.0003659177711829598,
+          "poor_iface_low_kf": 0.00035890383800306683
+        },
+        "150um": {
+          "good_iface_high_kf": 0.00046124781606125153,
+          "good_iface_low_kf": 0.00045138412629614475,
+          "nominal": 0.00046315174917877406,
+          "poor_iface_high_kf": 0.0005050897466779613,
+          "poor_iface_low_kf": 0.0004952382818195619
+        }
+      },
+      "0.05": {
+        "50um": {
+          "good_iface_high_kf": 0.0003075357564301654,
+          "good_iface_low_kf": 0.0003021083556857181,
+          "nominal": 0.00031029708741123435,
+          "poor_iface_high_kf": 0.00035010217993933224,
+          "poor_iface_low_kf": 0.0003449000614606947
+        },
+        "100um": {
+          "good_iface_high_kf": 0.0008759534692874733,
+          "good_iface_low_kf": 0.0008654191520750692,
+          "nominal": 0.0008823507575755713,
+          "poor_iface_high_kf": 0.000968002338125539,
+          "poor_iface_low_kf": 0.0009570297348688665
+        },
+        "150um": 

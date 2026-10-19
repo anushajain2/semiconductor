@@ -1,0 +1,51 @@
+# Phase 1 study: CPU-only 2D demonstrator (guide sections 5-6).
+name: phase1_alumina_epoxy_2d
+material: configs/materials/alumina_epoxy_dev.yaml
+scenarios: configs/scenarios_phase1.yaml
+
+layer:
+  thickness: 100 um
+  width: 200 um        # insulated sidewalls; lateral size studied in Phase 2
+  margin: 3 um         # fixed resin-rich margin at every boundary
+
+geometry:
+  min_gap: 1.0 um      # minimum particle-particle surface separation (resin film)
+  d_min: 1.0 um
+  d_max: 60 um
+  max_long_axis_fraction: 0.9
+  max_truncated_mass: 0.10
+  loading_tolerance: 0.005
+  max_attempts: 3000
+  restarts: 3
+
+mesh:
+  n_across_gap: 3
+  n_perimeter: 48
+  h_bulk: 6 um
+  h_min: 0.15 um
+  face_elements_in_margin: 2
+  size_factor: 1.0     # design-loop mesh; finalists are re-solved at 0.7 (reported) and 0.5 (refinement check)
+  min_quality: 0.05
+
+design_space:
+  # filler loading is compared at fixed levels; it is never a free optimisation variable
+  loading_levels: [0.30]
+  preferred_angle: 90 deg   # major axes along the through-thickness heat flow
+  bounds:
+    d50: [4 um, 24 um]      # log-scaled
+    sigma_ln: [0.05, 0.50]
+    aspect: [1.0, 4.0]
+    order: [0.0, 0.95]
+
+budget:
+  workers: 4
+  initial_designs: 40
+  seeds: [0, 1, 2]
+  bo_iterations: 10
+  bo_batch: 4
+  explore_per_batch: 1
+  sobol_seed: 20261019
+  random_search_seed: 7
+  final_seeds: [1000, 1001, 1002, 1003, 1004, 1005]
+  final_refinements: [0.7, 0.5]
+  shortlist: 3

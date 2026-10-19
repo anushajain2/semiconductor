@@ -1,0 +1,345 @@
+{
+  "created": "2026-10-19T22:09:07+00:00",
+  "code_version": "tcid-0.1.0@uncommitted+dirty",
+  "config_hash": "29f06202011fa528",
+  "config": {
+    "study": {
+      "name": "phase1_alumina_epoxy_2d",
+      "material": "configs/materials/alumina_epoxy_dev.yaml",
+      "scenarios": "configs/scenarios_phase1.yaml",
+      "layer": {
+        "thickness": "100 um",
+        "width": "200 um",
+        "margin": "3 um"
+      },
+      "geometry": {
+        "min_gap": "1.0 um",
+        "d_min": "1.0 um",
+        "d_max": "60 um",
+        "max_long_axis_fraction": 0.9,
+        "max_truncated_mass": 0.1,
+        "loading_tolerance": 0.005,
+        "max_attempts": 3000,
+        "restarts": 3
+      },
+      "mesh": {
+        "n_across_gap": 3,
+        "n_perimeter": 48,
+        "h_bulk": "6 um",
+        "h_min": "0.15 um",
+        "face_elements_in_margin": 2,
+        "size_factor": 1.0,
+        "min_quality": 0.05
+      },
+      "design_space": {
+        "loading_levels": [
+          0.3
+        ],
+        "preferred_angle": "90 deg",
+        "bounds": {
+          "d50": [
+            "4 um",
+            "24 um"
+          ],
+          "sigma_ln": [
+            0.05,
+            0.5
+          ],
+          "aspect": [
+            1.0,
+            4.0
+          ],
+          "order": [
+            0.0,
+            0.95
+          ]
+        }
+      },
+      "budget": {
+        "workers": 4,
+        "initial_designs": 40,
+        "seeds": [
+          0,
+          1,
+          2
+        ],
+        "bo_iterations": 10,
+        "bo_batch": 4,
+        "explore_per_batch": 1,
+        "sobol_seed": 20261019,
+        "random_search_seed": 7,
+        "final_seeds": [
+          1000,
+          1001,
+          1002,
+          1003,
+          1004,
+          1005
+        ],
+        "final_refinements": [
+          0.7,
+          0.5
+        ],
+        "shortlist": 3
+      }
+    },
+    "material": {
+      "name": "alumina_epoxy_dev_2d",
+      "status": "development-only isotropic stand-in (not BN); all properties assumed",
+      "k_matrix": 0.2,
+      "k_filler_par": 30.0,
+      "k_filler_perp": 30.0,
+      "rho_matrix": 1200.0,
+      "rho_filler": 3950.0,
+      "sources": {
+        "matrix": "SR-002",
+        "filler": "SR-003"
+      }
+    },
+    "scenarios": [
+      {
+        "name": "nominal",
+        "r_interface": 1e-07,
+        "k_filler_scale": 1.0,
+        "k_matrix_scale": 1.0,
+        "r_top": 0.0,
+        "r_bottom": 0.0,
+        "role": "nominal"
+      },
+      {
+        "name": "good_iface_low_kf",
+        "r_interface": 1e-08,
+        "k_filler_scale": 0.6666666666666666,
+        "k_matrix_scale": 1.0,
+        "r_top": 0.0,
+        "r_bottom": 0.0,
+        "role": "stress"
+      },
+      {
+        "name": "good_iface_high_kf",
+        "r_interface": 1e-08,
+        "k_filler_scale": 1.1666666666666667,
+        "k_matrix_scale": 1.0,
+        "r_top": 0.0,
+        "r_bottom": 0.0,
+        "role": "stress"
+      },
+      {
+        "name": "poor_iface_low_kf",
+        "r_interface": 1e-06,
+        "k_filler_scale": 0.6666666666666666,
+        "k_matrix_scale": 1.0,
+        "r_top": 0.0,
+        "r_bottom": 0.0,
+        "role": "stress"
+      },
+      {
+        "name": "poor_iface_high_kf",
+        "r_interface": 1e-06,
+        "k_filler_scale": 1.1666666666666667,
+        "k_matrix_scale": 1.0,
+        "r_top": 0.0,
+        "r_bottom": 0.0,
+        "role": "stress"
+      }
+    ]
+  },
+  "environment": {
+    "python": "3.13.16",
+    "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-fem": "12.0.2",
+    "gmsh": "4.15.2",
+    "shapely": "2.2.0",
+    "scikit-learn": "1.9.1",
+    "pandas": "3.0.6"
+  },
+  "files": [
+    {
+      "path": "design/initial_rows.parquet",
+      "bytes": 145110,
+      "sha256": "4975ba2efcaba0ce497063f9f41666215d144ba1a22f0db9223f2edf371fc1dd"
+    },
+    {
+      "path": "failures.parquet",
+      "bytes": 19585,
+      "sha256": "9f2e5471a3b33f703fd8182df0b7a1210fa30337a782a6a4710a2894ccbdaa61"
+    },
+    {
+      "path": "fields/b629dc36a2acf259.npz",
+      "bytes": 4032290,
+      "sha256": "d6cb482f913768f5549b14f3ca014597105a5609148c3fb1bec8cf3cf39fd83d"
+    },
+    {
+      "path": "fields/ce9964348756174b.npz",
+      "bytes": 4159445,
+      "sha256": "59c7cc04fbea0bfc0e07961bb441fef63be78bc4e53f9c2a329a9243e0d1f6d6"
+    },
+    {
+      "path": "final/candidates.json",
+      "bytes": 2970,
+      "sha256": "ef6c88100944ac894e04eb18c3adbb112dae1fc061b2a5afab4e18a07faf16b7"
+    },
+    {
+      "path": "final/final.json",
+      "bytes": 9797,
+      "sha256": "90cd9d0891e54c707ae566a9f48aab8f7cccec0a3a6cdf245360054a2b24cd3f"
+    },
+    {
+      "path": "final/final_rows.parquet",
+      "bytes": 113979,
+      "sha256": "3e01686462d7cdffa0ceaae3543ae93613d3122939904ee1653da263b2f3f92b"
+    },
+    {
+      "path": "final/final_summary.parquet",
+      "bytes": 12272,
+      "sha256": "360f65d897c4e365fef00a4f7aaba587a4ccf407ad13a2077d917137b5ae90f6"
+    },
+    {
+      "path": "final/mesh_refinement.parquet",
+      "bytes": 6282,
+      "sha256": "795abeeea067429f442e5270ecb70df251eed58915f330c9b14c9aa4f788517a"
+    },
+    {
+      "path": "final/paired_differences.parquet",
+      "bytes": 5302,
+      "sha256": "cc38615848bc912c462d2155b20d108120dc2904c67087bab024bab3d0176a7a"
+    },
+    {
+      "path": "gate.json",
+      "bytes": 1326,
+      "sha256": "8b4e5d158fb5fc9a8a2776fef65704751b536f7ed2f374839add9ee546156875"
+    },
+    {
+      "path": "pilot/pilot.json",
+      "bytes": 781,
+      "sha256": "a71980db781199daee3bfec2b57ff26c03fba90088a309a8a8fbfddda1da0ed4"
+    },
+    {
+      "path": "pilot/pilot_rows.parquet",
+      "bytes": 60495,
+      "sha256": "96d1a49784ff8868e92b13ed8dc5e335b7d2ee5221722d5103f0410a7a743c83"
+    },
+    {
+      "path": "questions/q1.json",
+      "bytes": 1018,
+      "sha256": "1ceb80f573a6d4ca3c765582b53487e2576d3036caa8103fcfadf45518fbb009"
+    },
+    {
+      "path": "questions/q1_map.parquet",
+      "bytes": 7609,
+      "sha256": "4d3bc60303f44add9aaa423cf98e3ca0002f8af7767d46e08e4c0ebcd9824172"
+    },
+    {
+      "path": "questions/q1_summary.parquet",
+      "bytes": 12856,
+      "sha256": "ddf756dc16880ecfa507308a8e6ea95ec05cfd731a3f9e5a4df4343440fe39a0"
+    },
+    {
+      "path": "questions/q1q4_rows.parquet",
+      "bytes": 141905,
+      "sha256": "d16da0a464f725adfb3c3d1a03170cc20eea6813f6ddb2538e59944b88878430"
+    },
+    {
+      "path": "questions/q2.json",
+      "bytes": 2137,
+      "sha256": "f90fb53e595a3a908b7e77b0885cabb6dc195f9c598f4c07bbe5ffc13b1307c1"
+    },
+    {
+      "path": "questions/q2_benefit.parquet",
+      "bytes": 8079,
+      "sha256": "8b0eef1da47a66c8941718b963f5db53785922b8a18d72da8204a3fe781fcb75"
+    },
+    {
+      "path": "questions/q2_robin.parquet",
+      "bytes": 5004,
+      "sha256": "b6c88cdb2e742c38771920050b531e2d5507180e4ba176dcd443c0ce72445c6f"
+    },
+    {
+      "path": "questions/q2_robin_rows.parquet",
+      "bytes": 44673,
+      "sha256": "efc456df1c5134c47732e6a3b24e21a4b05bb5e39aa5726ef0e56897c9d631f5"
+    },
+    {
+      "path": "questions/q2_rows.parquet",
+      "bytes": 62848,
+      "sha256": "4b2e91cdb63dc08825ee5989337e7a9d515391574e1fd4eee79a4e66bc095b81"
+    },
+    {
+      "path": "questions/q3.json",
+      "bytes": 1824,
+      "sha256": "378036e171b2d060e308a16ba55e09d4e441ac3449d417c93fc3d9ae9e4bc926"
+    },
+    {
+      "path": "questions/q3_advantage.parquet",
+      "bytes": 7828,
+      "sha256": "bea12c71e4e36495e59914c3e6145fb0c9c0d3fdc3ec53ea28743a93a9095c67"
+    },
+    {
+      "path": "questions/q3_rows.parquet",
+      "bytes": 108510,
+      "sha256": "fa3c2aa6470ae7458f32c4c49f41e283bbbc4ebb8147e08361eca5810dd251d5"
+    },
+    {
+      "path": "questions/q4.json",
+      "bytes": 1521,
+      "sha256": "d995a1933dd17ce0af5a43f62ab38ee28d732c91bc90f89d256b672dd31df212"
+    },
+    {
+      "path": "search/best_so_far.parquet",
+      "bytes": 9534,
+      "sha256": "1dcdcf0c5b4ef29f93d0280838fb14aca86ff991ee614f36b0c65647a5edead2"
+    },
+    {
+      "path": "search/bo_history.json",
+      "bytes": 5714,
+      "sha256": "99557c4a745350a1573cc7ea5e9ebd30984829d5879de942eb4efd88aca0c5ae"
+    },
+    {
+      "path": "search/comparison.json",
+      "bytes": 1751,
+      "sha256": "0e5bde231fb40fd20f74f8dee8c1d780d302cbcb6bcbcd11bd764f393d4b5195"
+    },
+    {
+      "path": "search/loop_rows.parquet",
+      "bytes": 240322,
+      "sha256": "e2538ae69e842ec4390738cde5dd03b1600226f2eee492dafbe60b49ad26346a"
+    },
+    {
+      "path": "search/random_rows.parquet",
+      "bytes": 247435,
+      "sha256": "462951176b7527897553936162f42a039b92cbf6bccb0826146e83d7d099290a"
+    },
+    {
+      "path": "search/sweep_rows.parquet",
+      "bytes": 223441,
+      "sha256": "3c99775a89c36bbb3ac1b6ebc6884adb3eeea9a9c005c7e5bd1f038d312b5831"
+    },
+    {
+      "path": "surrogate/cv_initial.json",
+      "bytes": 742,
+      "sha256": "496137ce0bc3a2e5a3b25c7373effa1cdc09683cc0a14a0b99a77915ffc566bb"
+    },
+    {
+      "path": "surrogate/cv_loop.json",
+      "bytes": 768,
+      "sha256": "1e8024705846f99b7945428b364218e137fbf0788d4cb4a04c3b25dd36bf3a91"
+    },
+    {
+      "path": "surrogate/cv_predictions_initial.parquet",
+      "bytes": 12598,
+      "sha256": "164207bd747fee6ae144f23e210b1020ed4f9865218d463961567b72e9e7a2fb"
+    },
+    {
+      "path": "surrogate/cv_predictions_loop.parquet",
+      "bytes": 20176,
+      "sha256": "34c455134d439be84f35b8194f50542cbf4c29290333c00868aaebb4672e60de"
+    },
+    {
+      "path": "surrogate/gp_final.joblib",
+      "bytes": 1220978,
+      "sha256": "e1bffd6713b1f2e216133c89d4a18de5daefafb1e15df1c9e957c3494cf20f57"
+    }
+  ]
+}

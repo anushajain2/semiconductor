@@ -1,0 +1,61 @@
+{
+  "advantage_by_variant": {
+    "d50_x0.8": {
+      "advantage_rel": 0.23574230447606404,
+      "relative_to_reference": 1.086848796935381,
+      "t_ratio": 25.09718453809791
+    },
+    "d50_x1.2": {
+      "advantage_rel": 0.25628659157223355,
+      "relative_to_reference": 1.2243058188474543,
+      "t_ratio": 9.502672210614922
+    },
+    "margin_1.5um": {
+      "advantage_rel": 0.2367754609509108,
+      "relative_to_reference": 1.068738418498676,
+      "t_ratio": 13.771103581227232
+    },
+    "margin_6um": {
+      "advantage_rel": 0.20314396657704856,
+      "relative_to_reference": 0.961889010286027,
+      "t_ratio": 11.890319534074532
+    },
+    "min_gap_0.5um": {
+      "advantage_rel": 0.20926752263957865,
+      "relative_to_reference": 0.9462129493200451,
+      "t_ratio": 10.136620661435211
+    },
+    "min_gap_2um": {
+      "advantage_rel": 0.22508216538652032,
+      "relative_to_reference": 1.0330655457394327,
+      "t_ratio": 12.732759861188702
+    },
+    "order_minus_0.1": {
+      "advantage_rel": 0.1933845944384056,
+      "relative_to_reference": 0.8860063816653578,
+      "t_ratio": 11.079749004904787
+    },
+    "order_minus_0.2": {
+      "advantage_rel": 0.16056121698434783,
+      "relative_to_reference": 0.7355378916713653,
+      "t_ratio": 5.909957995497315
+    },
+    "reference": {
+      "advantage_rel": 0.218264724006542,
+      "relative_to_reference": 1.0,
+      "t_ratio": 13.084616374340152
+    },
+    "sigma_plus_0.1": {
+      "advantage_rel": 0.19878066190702648,
+      "relative_to_reference": 0.8944831678997998,
+      "t_ratio": 13.616480380476062
+    },
+    "width_x2": {
+      "advantage_rel": 0.20317253867885268,
+      "relative_to_reference": 0.931552191359388,
+      "t_ratio": 12.207702550426937
+    }
+  },
+  "min_t_ratio_reference": 12.385271603581328,
+  "failures": {}
+}

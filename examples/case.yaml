@@ -1,0 +1,19 @@
+# One configured case for `tcid solve examples/case.yaml`
+material: configs/materials/alumina_epoxy_dev.yaml
+scenarios: configs/scenarios_phase1.yaml
+design:
+  loading: 0.30
+  d50: 10 um
+  sigma_ln: 0.3
+  aspect: 3.0
+  order: 0.8
+  preferred_angle: 90 deg
+seed: 0
+layer:
+  thickness: 100 um
+  width: 200 um
+  margin: 3 um
+geometry:
+  min_gap: 1.0 um
+mesh:
+  size_factor: 1.0

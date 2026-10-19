@@ -1,0 +1,126 @@
+# Source register (guide section 4). Every physical range used by the tool is listed here
+# with its provenance status:
+#   measured  - value read from a cited measurement (figure/table recorded)
+#   inferred  - derived from cited data through a stated model
+#   assumed   - modelling choice; plausible order of magnitude, not a measurement
+#   pending   - source identified, values not yet extracted
+# Phase 1 uses only the development case (alumina-like isotropic filler). No entry below
+# is a measurement of the formulation being designed. The build environment had no access
+# to the publisher pages of [2]-[5], so their numerical content has NOT been extracted;
+# those entries are marked "pending" and must be completed before Phase 2.
+
+register_version: 1
+checked: 2026-10-19
+
+references:
+  R1: "Hashemi, Safdari, Sheidaei. A supervised machine learning approach for accelerating the design of particulate composites: application to thermal conductivity. Comput. Mater. Sci. 2021; arXiv:2010.00041"
+  R2: "Achieving High Thermal Conductivity in Epoxy Composites: Effect of Boron Nitride Particle Size and Matrix-Filler Interface. Polymers 2019, 11, 1156. PMC6680888"
+  R3: "Narumanchi et al. Thermal Interface Materials for Power Electronics Applications. NREL preprint 2008, report 42972"
+  R4: "Atomic-scale insights into interface thermal resistance between epoxy and boron nitride in nanocomposites. Int. J. Heat Mass Transfer 2021"
+  R5: "Fathidoost, Yang. Thermal conductivity analysis of polymer-derived nano-composite ... Zenodo 10213660 (2023, updated 2024)"
+
+entries:
+  - id: SR-001
+    quantity: BN-epoxy formulation, cure, BN grades and through-plane conductivity data
+    source: R2
+    figure_or_table: TO EXTRACT
+    resin_cure_treatment_morphology: TO EXTRACT (resin, hardener, cure schedule, BN grades, surface treatment)
+    temperature_and_direction: TO EXTRACT
+    units_and_fraction_basis: TO EXTRACT (wt% vs vol%; densities used)
+    status: pending
+    uncertainty: n/a
+    used_in: Phase 2 coherent BN material case (not used in Phase 1)
+    note: Starting experimental case named by the guide. Missing geometry/interface information must remain an uncertainty interval.
+
+  - id: SR-002
+    quantity: epoxy matrix thermal conductivity
+    value: 0.20
+    interval: [0.17, 0.23]
+    units: W/(m K)
+    source: none (generic order of magnitude for unfilled cured epoxies)
+    figure_or_table: n/a
+    resin_cure_treatment_morphology: generic cured epoxy; no specific resin
+    temperature_and_direction: room temperature; isotropic
+    units_and_fraction_basis: n/a
+    status: assumed
+    uncertainty: held fixed in Phase 1 scenarios; acts nearly as a common scale on every design
+    used_in: configs/materials/alumina_epoxy_dev.yaml
+    note: Replace with the resin value reported in R2 for Phase 2.
+
+  - id: SR-003
+    quantity: alumina-like isotropic filler conductivity (development stand-in)
+    value: 30
+    interval: [20, 35]
+    units: W/(m K)
+    source: none (order of magnitude for dense polycrystalline alumina)
+    figure_or_table: n/a
+    resin_cure_treatment_morphology: idealised dense isotropic particles
+    temperature_and_direction: room temperature; isotropic
+    units_and_fraction_basis: n/a
+    status: assumed
+    uncertainty: scenarios use 20 and 35 W/(m K); independent of interface resistance
+    used_in: configs/materials/alumina_epoxy_dev.yaml, configs/scenarios_phase1.yaml
+    note: Development-only. Results with this filler are not evidence for BN.
+
+  - id: SR-004
+    quantity: particle-matrix area-specific interface resistance (effective)
+    value: 1.0e-7
+    interval: [1.0e-8, 1.0e-6]
+    boundary_stress: [1.0e-9, 1.0e-5]
+    units: m^2 K/W
+    source: R4 (establishes that the interface needs separate physical treatment; values not transferred)
+    figure_or_table: n/a
+    resin_cure_treatment_morphology: unspecified; effective value lumps bonding quality and interfacial defects
+    temperature_and_direction: normal to each particle surface
+    units_and_fraction_basis: area-specific (per unit interface area)
+    status: assumed
+    uncertainty: treated as an uncertain physical input, never as a design knob; values above 1e-6 are labelled boundary stress cases
+    used_in: configs/scenarios_phase1.yaml, research questions Q1 and Q4
+    note: Interface parameters must not be transferred between chemistries without justification (R4).
+
+  - id: SR-005
+    quantity: outer adhesive-to-substrate contact resistance (each face)
+    value: 0
+    interval: [0, 3.0e-5]
+    boundary_stress: [0, 1.0e-4]
+    units: m^2 K/W
+    source: R3 (contact resistance, thickness and conductivity are separate contributors)
+    figure_or_table: n/a
+    resin_cure_treatment_morphology: n/a
+    temperature_and_direction: through-thickness
+    units_and_fraction_basis: area-specific
+    status: assumed
+    uncertainty: varied separately for top and bottom faces in Q2; not a free manufacturing choice
+    used_in: research question Q2
+
+  - id: SR-006
+    quantity: densities for weight/volume conversion
+    value: {epoxy: 1.20, alumina: 3.95, hBN: 2.1-2.28}
+    units: g/cm^3
+    source: none (nominal handbook-order values)
+    status: assumed
+    uncertainty: affects only wt% <-> vol% conversion; Phase 1 works in area fraction
+    used_in: tcid.units.weight_to_volume_fraction
+    note: A 2D area fraction is not an experimentally established 3D volume fraction.
+
+  - id: SR-007
+    quantity: adhesive layer thickness
+    value: 100e-6
+    interval: [50e-6, 150e-6]
+    units: m
+    source: R3 (layer thickness is a separate resistance contributor)
+    status: assumed
+    uncertainty: fixed within each comparison; selected thicknesses repeated in the studies
+    used_in: configs/study_phase1.yaml, research questions
+
+  - id: SR-008
+    quantity: ceramic composite microstructure and conductivity dataset
+    source: R5
+    status: pending
+    used_in: optional workflow check only; its properties cannot calibrate the BN-epoxy case
+
+  - id: SR-009
+    quantity: hBN platelet conductivity tensor (in-plane / through-plane)
+    source: R2, R4 and further literature to be selected
+    status: pending
+    used_in: Phase 2 only (3D oriented platelets). Do not substitute ideal monolayer values without justification.

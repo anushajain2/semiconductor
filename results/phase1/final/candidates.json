@@ -1,0 +1,122 @@
+{
+  "robust_opt": {
+    "loading": 0.3,
+    "d50": 2.108874794890566e-05,
+    "sigma_ln": 0.05,
+    "aspect": 4.0,
+    "order": 0.8410684855286229,
+    "preferred_angle": 1.5707963267948966
+  },
+  "shortlist_2": {
+    "loading": 0.3,
+    "d50": 9.606185231171466e-06,
+    "sigma_ln": 0.4010878925267659,
+    "aspect": 4.0,
+    "order": 0.95,
+    "preferred_angle": 1.5707963267948966
+  },
+  "shortlist_3": {
+    "loading": 0.3,
+    "d50": 1.6647566939197593e-05,
+    "sigma_ln": 0.16727471096691776,
+    "aspect": 4.0,
+    "order": 0.95,
+    "preferred_angle": 1.5707963267948966
+  },
+  "nominal_opt": {
+    "loading": 0.3,
+    "d50": 6.717031019410964e-06,
+    "sigma_ln": 0.4176086102211366,
+    "aspect": 4.0,
+    "order": 0.8749549213108004,
+    "preferred_angle": 1.5707963267948966
+  },
+  "random_search_best": {
+    "loading": 0.3,
+    "d50": 1.727008629099344e-05,
+    "sigma_ln": 0.22075077719764064,
+    "aspect": 3.9362436532336647,
+    "order": 0.5604921083600798,
+    "preferred_angle": 1.5707963267948966
+  },
+  "sweep_best": {
+    "loading": 0.3,
+    "d50": 9.797958971132717e-06,
+    "sigma_ln": 0.275,
+    "aspect": 4.0,
+    "order": 0.95,
+    "preferred_angle": 1.5707963267948966
+  },
+  "robust_opt__S0": {
+    "loading": 0.3,
+    "d50": 2.108874794890566e-05,
+    "sigma_ln": 0.05,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "shortlist_2__S0": {
+    "loading": 0.3,
+    "d50": 9.606185231171466e-06,
+    "sigma_ln": 0.4010878925267659,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "shortlist_3__S0": {
+    "loading": 0.3,
+    "d50": 1.6647566939197593e-05,
+    "sigma_ln": 0.16727471096691776,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "nominal_opt__S0": {
+    "loading": 0.3,
+    "d50": 6.717031019410964e-06,
+    "sigma_ln": 0.4176086102211366,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "random_search_best__S0": {
+    "loading": 0.3,
+    "d50": 1.727008629099344e-05,
+    "sigma_ln": 0.22075077719764064,
+    "aspect": 3.9362436532336647,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "sweep_best__S0": {
+    "loading": 0.3,
+    "d50": 9.797958971132717e-06,
+    "sigma_ln": 0.275,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "conventional_circles": {
+    "loading": 0.3,
+    "d50": 1e-05,
+    "sigma_ln": 0.3,
+    "aspect": 1.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  },
+  "recommended": {
+    "loading": 0.3,
+    "d50": 6.717031019410964e-06,
+    "sigma_ln": 0.4176086102211366,
+    "aspect": 4.0,
+    "order": 0.8749549213108004,
+    "preferred_angle": 1.5707963267948966
+  },
+  "baseline_random_orientation": {
+    "loading": 0.3,
+    "d50": 6.717031019410964e-06,
+    "sigma_ln": 0.4176086102211366,
+    "aspect": 4.0,
+    "order": 0.0,
+    "preferred_angle": 1.5707963267948966
+  }
+}

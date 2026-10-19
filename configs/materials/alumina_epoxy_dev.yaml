@@ -1,0 +1,15 @@
+# Development-only material case (guide section 2): an isotropic alumina-like filler in
+# epoxy, used to develop and verify the solver and the design loop. Results obtained with
+# this case are NOT evidence for boron nitride. Every value is an assumption recorded in
+# data/source_register.yaml; none is a measurement of a specific formulation.
+name: alumina_epoxy_dev_2d
+status: development-only isotropic stand-in (not BN); all properties assumed
+matrix:
+  k: 0.20 W/mK          # SR-002 (assumed)
+  density: 1.20 g/cm3   # SR-006 (assumed)
+  source: SR-002
+filler:
+  k_parallel: 30 W/mK   # SR-003 (assumed), isotropic: k_perp = k_parallel
+  k_perp: 30 W/mK
+  density: 3.95 g/cm3   # SR-006 (assumed)
+  source: SR-003

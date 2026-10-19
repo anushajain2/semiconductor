@@ -1,0 +1,21 @@
+# Physical-input stress scenarios (guide section 6). These are a finite set of plausible
+# interface/property combinations, NOT probability-weighted samples: results over them
+# are worst-case/trade-off statements, never calibrated reliability estimates.
+# Values come from the intervals in data/source_register.yaml (SR-003, SR-004).
+scenarios:
+  - name: nominal
+    role: nominal
+    r_interface: 1.0e-7 m2K/W
+    k_filler: 30 W/mK
+  - name: good_iface_low_kf
+    r_interface: 1.0e-8 m2K/W
+    k_filler: 20 W/mK
+  - name: good_iface_high_kf
+    r_interface: 1.0e-8 m2K/W
+    k_filler: 35 W/mK
+  - name: poor_iface_low_kf
+    r_interface: 1.0e-6 m2K/W
+    k_filler: 20 W/mK
+  - name: poor_iface_high_kf
+    r_interface: 1.0e-6 m2K/W
+    k_filler: 35 W/mK

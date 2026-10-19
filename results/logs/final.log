@@ -1,0 +1,164 @@
+  [7/78 jobs, 2s]
+  [14/78 jobs, 2s]
+  [21/78 jobs, 2s]
+  [28/78 jobs, 2s]
+  [35/78 jobs, 3s]
+  [42/78 jobs, 3s]
+  [49/78 jobs, 19s]
+  [56/78 jobs, 19s]
+  [63/78 jobs, 20s]
+  [70/78 jobs, 29s]
+  [77/78 jobs, 35s]
+  final: 78 jobs, 390 solves, 0 failures, 35s
+  [1/2 jobs, 9s]
+  [2/2 jobs, 9s]
+  final-fields: 2 jobs, 2 solves, 0 failures, 9s
+  [1/4 jobs, 30s]
+  [2/4 jobs, 30s]
+  [3/4 jobs, 30s]
+  [4/4 jobs, 30s]
+  final-refine: 4 jobs, 20 solves, 0 failures, 31s
+  [1/4 jobs, 7s]
+  [2/4 jobs, 7s]
+  [3/4 jobs, 7s]
+  [4/4 jobs, 7s]
+  final-coarse: 4 jobs, 20 solves, 0 failures, 8s
+{
+  "seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005
+  ],
+  "mesh_size_factor": 0.7,
+  "verified": {
+    "robust_opt": {
+      "design_id": "6d39bd4a6165",
+      "robust": 0.00018692347758618062,
+      "robust_se": 3.288739813204773e-06,
+      "nominal": 0.0001794016325638726,
+      "nominal_se": 3.3884027008514825e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.108874794890566e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.8410684855286229,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_2": {
+      "design_id": "0882810a0295",
+      "robust": 0.00018357151887467805,
+      "robust_se": 9.783162178072557e-07,
+      "nominal": 0.00017271842517063317,
+      "nominal_se": 1.0546173503134906e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.606185231171466e-06,
+        "sigma_ln": 0.4010878925267659,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_3": {
+      "design_id": "67d1f17409a2",
+      "robust": 0.00018548832215122254,
+      "robust_se": 1.8371218313140013e-06,
+      "nominal": 0.0001770872253670126,
+      "nominal_se": 1.9821645334532052e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.6647566939197593e-05,
+        "sigma_ln": 0.16727471096691776,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "nominal_opt": {
+      "design_id": "10286d789fb9",
+      "robust": 0.00018080499669751295,
+      "robust_se": 1.1744502652674407e-06,
+      "nominal": 0.0001674550225313283,
+      "nominal_se": 1.2825055500173945e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 6.717031019410964e-06,
+        "sigma_ln": 0.4176086102211366,
+        "aspect": 4.0,
+        "order": 0.8749549213108004,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_best": {
+      "design_id": "e362f2e70bfe",
+      "robust": 0.0001962449293344509,
+      "robust_se": 3.1954899188597344e-06,
+      "nominal": 0.00018753648681639606,
+      "nominal_se": 3.45737781884876e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.727008629099344e-05,
+        "sigma_ln": 0.22075077719764064,
+        "aspect": 3.9362436532336647,
+        "order": 0.5604921083600798,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "sweep_best": {
+      "design_id": "0d99d341ddf6",
+      "robust": 0.0001831139021210021,
+      "robust_se": 2.6337135313041957e-06,
+      "nominal": 0.00017209547297014814,
+      "nominal_se": 2.8394995431286035e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.797958971132717e-06,
+        "sigma_ln": 0.275,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "robust_opt__S0": {
+      "design_id": "90a73a93f768",
+      "robust": 0.00023384658613918725,
+      "robust_se": 7.428263817713131e-06,
+      "nominal": 0.00022453778009017388,
+      "nominal_se": 7.320651915378286e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.108874794890566e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.0,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_2__S0": {
+      "design_id": "6dda832e18d4",
+      "robust": 0.0002314306220490671,
+      "robust_se": 3.0940128267932807e-06,
+      "nominal": 0.00021783814327372655,
+      "nominal_se": 3.255900628699555e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.606185231171466e-06,
+        "sigma_ln": 0.4010878925267659,
+        "aspect": 4.0,
+        "order": 0.0,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_3__S0": {
+      "design_id": "07aca1928ee7",
+      "robust": 0.00023082252342570902,
+      "robust_se": 5.0709365131897e-06,
+      "nominal": 0.00021998174985125493,
+      "nominal_se": 5.065748585858894e-06,
+      "design": {
+        "loa

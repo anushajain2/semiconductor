@@ -1,0 +1,38 @@
+{
+  "recommended": {
+    "total_sd": 8.490807839557935e-06,
+    "mean": 3.260603851290721e-05,
+    "range": 2.399678017665961e-05,
+    "fraction_positive": 1.0,
+    "variance_reduction_orientation_achieved": 0.9812792140363485,
+    "variance_reduction_interface_resistance": 0.016914276526395988,
+    "variance_reduction_filler_conductivity": 8.557150448329498e-05
+  },
+  "small_particles_aligned": {
+    "total_sd": 1.179826869485634e-05,
+    "mean": 3.292472853374507e-05,
+    "range": 3.4570448602325225e-05,
+    "fraction_positive": 1.0,
+    "variance_reduction_orientation_achieved": 0.9720689938498321,
+    "variance_reduction_interface_resistance": 0.02495881178258319,
+    "variance_reduction_filler_conductivity": 3.837056863065236e-05
+  },
+  "large_particles_aligned": {
+    "total_sd": 1.1812794388068324e-05,
+    "mean": 1.988030656254034e-05,
+    "range": 3.798438162953892e-05,
+    "fraction_positive": 1.0,
+    "variance_reduction_orientation_achieved": 0.8886011999903444,
+    "variance_reduction_interface_resistance": 0.11073258935920338,
+    "variance_reduction_filler_conductivity": 1.3469997273141132e-07
+  },
+  "large_minus_small": {
+    "total_sd": 6.042369454876453e-06,
+    "mean": 1.3044421971204726e-05,
+    "range": 2.047454169528274e-05,
+    "fraction_positive": 0.9333333333333333,
+    "variance_reduction_orientation_achieved": 0.07677086004633404,
+    "variance_reduction_interface_resistance": 0.9196347936362612,
+    "variance_reduction_filler_conductivity": 0.00012952031052237967
+  }
+}

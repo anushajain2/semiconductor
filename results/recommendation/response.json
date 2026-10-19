@@ -1,0 +1,93 @@
+{
+  "supported": true,
+  "text": "Verified candidate distributions (fresh geometry seeds, refined mesh):\n\ncandidate                                 d50 um  sigma    AR     S       R_robust    R_nom  vs baseline\nnominal_opt *                               6.72   0.42  4.00  0.87    180.8mm2K/W    167.5      +22.4%\nrobust_opt ~                               21.09   0.05  4.00  0.84    186.9mm2K/W    179.4      +19.7%\nshortlist_2 ~                               9.61   0.40  4.00  0.95    183.6mm2K/W    172.7      +21.2%\nshortlist_3                                16.65   0.17  4.00  0.95    185.5mm2K/W    177.1      +20.3%\nbaseline (random orientation)               6.72   0.42  4.00  0.00    232.8mm2K/W    215.7       +0.0%\n\n* recommended;  ~ statistically indistinguishable from the recommended design (< 2 SE): choose on other grounds.\nSensitivity: worst-case values above are the maximum over the stress scenarios good_iface_low_kf, good_iface_high_kf, poor_iface_low_kf, poor_iface_high_kf (stress cases, not probabilities).\nDesign map (Q1): within the supported interface range the leading candidate is small_particles_aligned; 100% of map cells cannot distinguish the top two.\nConfiguration files written to results/recommendation/ (solve one with `tcid solve <file>`).\n\nModelled domain: 2D cross-section of a cured particle-filled epoxy layer between isothermal faces with insulated sidewalls; steady linear conduction; isotropic alumina-like development filler (NOT boron nitride); area fraction (not a 3D volume fraction); particle-matrix interface resistance and filler conductivity treated as stress scenarios, not probabilities; outer contacts added in series. Not modelled: 3D connectivity, BN anisotropy, viscosity/processing, adhesion, cure, dielectric breakdown, stress, ageing. Not a qualified adhesive.",
+  "candidates": [
+    {
+      "label": "nominal_opt",
+      "role": "recommended",
+      "distinguishable_from_recommended": false,
+      "design_id": "10286d789fb9",
+      "robust": 0.00018080499669751295,
+      "robust_se": 1.1744502652674407e-06,
+      "nominal": 0.0001674550225313283,
+      "nominal_se": 1.2825055500173945e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 6.717031019410964e-06,
+        "sigma_ln": 0.4176086102211366,
+        "aspect": 4.0,
+        "order": 0.8749549213108004,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    {
+      "label": "robust_opt",
+      "role": "alternative",
+      "distinguishable_from_recommended": false,
+      "design_id": "6d39bd4a6165",
+      "robust": 0.00018692347758618062,
+      "robust_se": 3.288739813204773e-06,
+      "nominal": 0.0001794016325638726,
+      "nominal_se": 3.3884027008514825e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.108874794890566e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.8410684855286229,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    {
+      "label": "shortlist_2",
+      "role": "alternative",
+      "distinguishable_from_recommended": false,
+      "design_id": "0882810a0295",
+      "robust": 0.00018357151887467805,
+      "robust_se": 9.783162178072557e-07,
+      "nominal": 0.00017271842517063317,
+      "nominal_se": 1.0546173503134906e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.606185231171466e-06,
+        "sigma_ln": 0.4010878925267659,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    {
+      "label": "shortlist_3",
+      "role": "alternative",
+      "distinguishable_from_recommended": true,
+      "design_id": "67d1f17409a2",
+      "robust": 0.00018548832215122254,
+      "robust_se": 1.8371218313140013e-06,
+      "nominal": 0.0001770872253670126,
+      "nominal_se": 1.9821645334532052e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.6647566939197593e-05,
+        "sigma_ln": 0.16727471096691776,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    }
+  ],
+  "baseline": {
+    "design_id": "cc3ace59143c",
+    "robust": 0.0002328473879519894,
+    "robust_se": 2.9891371064895677e-06,
+    "nominal": 0.00021574421363423492,
+    "nominal_se": 2.857883089480684e-06,
+    "design": {
+      "loading": 0.3,
+      "d50": 6.717031019410964e-06,
+      "sigma_ln": 0.4176086102211366,
+      "aspect": 4.0,
+      "order": 0.0,
+      "preferred_angle": 1.5707963267948966
+    }
+  }
+}

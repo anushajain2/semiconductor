@@ -1,0 +1,219 @@
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 2s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 3s]
+  [7/12 jobs, 4s]
+  [8/12 jobs, 4s]
+  [9/12 jobs, 4s]
+  [10/12 jobs, 4s]
+  [11/12 jobs, 5s]
+  [12/12 jobs, 5s]
+  bo-1: 12 jobs, 60 solves, 0 failures, 5s
+  BO iteration 1: best robust R = 1.7930e-04 m2K/W
+  [1/12 jobs, 3s]
+  [2/12 jobs, 3s]
+  [3/12 jobs, 3s]
+  [4/12 jobs, 3s]
+  [5/12 jobs, 5s]
+  [6/12 jobs, 5s]
+  [7/12 jobs, 5s]
+  [8/12 jobs, 5s]
+  [9/12 jobs, 6s]
+  [10/12 jobs, 52s]
+  [11/12 jobs, 52s]
+  [12/12 jobs, 52s]
+  bo-2: 12 jobs, 60 solves, 0 failures, 52s
+  BO iteration 2: best robust R = 1.7836e-04 m2K/W
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 2s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 3s]
+  [7/12 jobs, 3s]
+  [8/12 jobs, 3s]
+  [9/12 jobs, 4s]
+  [10/12 jobs, 4s]
+  [11/12 jobs, 4s]
+  [12/12 jobs, 4s]
+  bo-3: 12 jobs, 60 solves, 0 failures, 4s
+  BO iteration 3: best robust R = 1.7836e-04 m2K/W
+  [1/12 jobs, 3s]
+  [2/12 jobs, 3s]
+  [3/12 jobs, 3s]
+  [4/12 jobs, 3s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 4s]
+  [7/12 jobs, 6s]
+  [8/12 jobs, 6s]
+  [9/12 jobs, 6s]
+  [10/12 jobs, 25s]
+  [11/12 jobs, 32s]
+  [12/12 jobs, 32s]
+  bo-4: 12 jobs, 60 solves, 0 failures, 32s
+  BO iteration 4: best robust R = 1.7830e-04 m2K/W
+  [1/12 jobs, 4s]
+  [2/12 jobs, 4s]
+  [3/12 jobs, 4s]
+  [4/12 jobs, 4s]
+  [5/12 jobs, 4s]
+  [6/12 jobs, 4s]
+  [7/12 jobs, 5s]
+  [8/12 jobs, 5s]
+  [9/12 jobs, 5s]
+  [10/12 jobs, 11s]
+  [11/12 jobs, 13s]
+  [12/12 jobs, 13s]
+  bo-5: 12 jobs, 45 solves, 3 failures, 13s
+  BO iteration 5: best robust R = 1.7830e-04 m2K/W
+  [1/12 jobs, 3s]
+  [2/12 jobs, 3s]
+  [3/12 jobs, 3s]
+  [4/12 jobs, 3s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 4s]
+  [7/12 jobs, 4s]
+  [8/12 jobs, 4s]
+  [9/12 jobs, 4s]
+  [10/12 jobs, 4s]
+  [11/12 jobs, 5s]
+  [12/12 jobs, 5s]
+  bo-6: 12 jobs, 60 solves, 0 failures, 5s
+  BO iteration 6: best robust R = 1.7830e-04 m2K/W
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 2s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 3s]
+  [7/12 jobs, 3s]
+  [8/12 jobs, 4s]
+  [9/12 jobs, 4s]
+  [10/12 jobs, 49s]
+  [11/12 jobs, 49s]
+  [12/12 jobs, 50s]
+  bo-7: 12 jobs, 60 solves, 0 failures, 50s
+  BO iteration 7: best robust R = 1.7830e-04 m2K/W
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 2s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 3s]
+  [7/12 jobs, 5s]
+  [8/12 jobs, 5s]
+  [9/12 jobs, 6s]
+  [10/12 jobs, 22s]
+  [11/12 jobs, 22s]
+  [12/12 jobs, 22s]
+  bo-8: 12 jobs, 60 solves, 0 failures, 22s
+  BO iteration 8: best robust R = 1.7573e-04 m2K/W
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 4s]
+  [5/12 jobs, 5s]
+  [6/12 jobs, 5s]
+  [7/12 jobs, 5s]
+  [8/12 jobs, 6s]
+  [9/12 jobs, 7s]
+  [10/12 jobs, 7s]
+  [11/12 jobs, 7s]
+  [12/12 jobs, 7s]
+  bo-9: 12 jobs, 45 solves, 3 failures, 7s
+  BO iteration 9: best robust R = 1.7573e-04 m2K/W
+  [1/12 jobs, 2s]
+  [2/12 jobs, 2s]
+  [3/12 jobs, 2s]
+  [4/12 jobs, 3s]
+  [5/12 jobs, 3s]
+  [6/12 jobs, 3s]
+  [7/12 jobs, 9s]
+  [8/12 jobs, 9s]
+  [9/12 jobs, 9s]
+  [10/12 jobs, 13s]
+  [11/12 jobs, 17s]
+  [12/12 jobs, 17s]
+  bo-10: 12 jobs, 45 solves, 3 failures, 18s
+  BO iteration 10: best robust R = 1.7573e-04 m2K/W
+  [24/240 jobs, 60s]
+  [48/240 jobs, 125s]
+  [72/240 jobs, 146s]
+  [96/240 jobs, 228s]
+  [120/240 jobs, 252s]
+  [144/240 jobs, 282s]
+  [168/240 jobs, 344s]
+  [192/240 jobs, 394s]
+  [216/240 jobs, 466s]
+  [240/240 jobs, 495s]
+  random: 240 jobs, 1200 solves, 0 failures, 495s
+  [24/243 jobs, 175s]
+  [48/243 jobs, 393s]
+  [72/243 jobs, 555s]
+  [96/243 jobs, 602s]
+  [120/243 jobs, 627s]
+  [144/243 jobs, 652s]
+  [168/243 jobs, 664s]
+  [192/243 jobs, 669s]
+  [216/243 jobs, 675s]
+  [240/243 jobs, 678s]
+  sweep: 243 jobs, 1090 solves, 25 failures, 678s
+{
+  "bayesian_optimisation": {
+    "n_designs_complete": 77,
+    "n_designs_requested": 77,
+    "solver_calls": 1155,
+    "cpu_hours": 0.39815194671194376,
+    "best_design_id": "6d39bd4a6165",
+    "best_robust": 0.00017573260662347105,
+    "best_nominal_of_best": 0.00016741948400702308,
+    "best_design": {
+      "d50": 2.108874794890566e-05,
+      "sigma_ln": 0.05,
+      "aspect": 4.0,
+      "order": 0.8410684855286229
+    },
+    "calls_to_within_1pct_of_overall_best": 1020,
+    "calls_to_within_1pct_of_own_best": 1020
+  },
+  "random_search": {
+    "n_designs_complete": 80,
+    "n_designs_requested": 80,
+    "solver_calls": 1200,
+    "cpu_hours": 0.5360216459730563,
+    "best_design_id": "e362f2e70bfe",
+    "best_robust": 0.0001929849893131747,
+    "best_nominal_of_best": 0.00018405035865955196,
+    "best_design": {
+      "d50": 1.727008629099344e-05,
+      "sigma_ln": 0.22075077719764064,
+      "aspect": 3.9362436532336647,
+      "order": 0.5604921083600798
+    },
+    "calls_to_within_1pct_of_overall_best": null,
+    "calls_to_within_1pct_of_own_best": 225
+  },
+  "sweep": {
+    "n_designs_complete": 72,
+    "n_designs_requested": 72,
+    "solver_calls": 1080,
+    "cpu_hours": 0.7114348958747235,
+    "best_design_id": "0d99d341ddf6",
+    "best_robust": 0.00017645250532481434,
+    "best_nominal_of_best": 0.00016475569885157656,
+    "best_design": {
+      "d50": 9.797958971132717e-06,
+      "sigma_ln": 0.275,
+      "aspect": 4.0,
+      "order": 0.95
+    },
+    "calls_to_within_1pct_of_overall_best": 585,
+    "calls_to_within_1pct_of_own_best": 585
+  },
+  "failures_by_tag_and_stage": {
+    "bo/geometry": 9,
+    "sweep/geometry": 25
+  }
+}

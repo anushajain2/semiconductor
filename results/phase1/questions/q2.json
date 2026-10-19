@@ -1,0 +1,64 @@
+{
+  "contact_total_where_benefit_falls_to": {
+    "0.10": {
+      "50um": {
+        "good_iface_high_kf": 9.820659726702223e-05,
+        "good_iface_low_kf": 9.478143628103453e-05,
+        "nominal": 9.902455368415524e-05,
+        "poor_iface_high_kf": 0.00011531033109542758,
+        "poor_iface_low_kf": 0.00011203598873604008
+      },
+      "100um": {
+        "good_iface_high_kf": 0.00032891242113322324,
+        "good_iface_low_kf": 0.00032200858585128435,
+        "nominal": 0.00033087412915596955,
+        "poor_iface_high_kf": 0.0003659177711829598,
+        "poor_iface_low_kf": 0.00035890383800306683
+      },
+      "150um": {
+        "good_iface_high_kf": 0.00046124781606125153,
+        "good_iface_low_kf": 0.00045138412629614475,
+        "nominal": 0.00046315174917877406,
+        "poor_iface_high_kf": 0.0005050897466779613,
+        "poor_iface_low_kf": 0.0004952382818195619
+      }
+    },
+    "0.05": {
+      "50um": {
+        "good_iface_high_kf": 0.0003075357564301654,
+        "good_iface_low_kf": 0.0003021083556857181,
+        "nominal": 0.00031029708741123435,
+        "poor_iface_high_kf": 0.00035010217993933224,
+        "poor_iface_low_kf": 0.0003449000614606947
+      },
+      "100um": {
+        "good_iface_high_kf": 0.0008759534692874733,
+        "good_iface_low_kf": 0.0008654191520750692,
+        "nominal": 0.0008823507575755713,
+        "poor_iface_high_kf": 0.000968002338125539,
+        "poor_iface_low_kf": 0.0009570297348688665
+      },
+      "150um": {
+        "good_iface_high_kf": 0.0012424633796719964,
+        "good_iface_low_kf": 0.001227830450567795,
+        "nominal": 0.0012499320555858482,
+        "poor_iface_high_kf": 0.0013563025503998088,
+        "poor_iface_low_kf": 0.001341370161531954
+      }
+    }
+  },
+  "robin_vs_series_max_rel_diff": 0.005829512198935501,
+  "seeds_solved_by_label_and_thickness": {
+    "baseline_random_orientation": {
+      "50um": 4,
+      "100um": 4,
+      "150um": 4
+    },
+    "recommended": {
+      "50um": 4,
+      "100um": 4,
+      "150um": 4
+    }
+  },
+  "note": "Identical series contacts cannot reorder candidates; they reduce the relative benefit."
+}

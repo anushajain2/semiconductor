@@ -1,0 +1,31 @@
+{
+  "n_runs": 20,
+  "n_failed": 0,
+  "scenarios_per_job": 5,
+  "cpu_s_per_job_mean": 11.279756953100037,
+  "cpu_s_per_job_max": 55.9994414720004,
+  "solve_s_mean": 1.2497920250300059,
+  "mesh_s_mean": 4.040447072249958,
+  "n_elements_mean": 141478.1,
+  "n_elements_max": 615114.0,
+  "planned_jobs": {
+    "initial": 120,
+    "bayesian_optimisation": 120,
+    "random_search": 240,
+    "sweep": 243
+  },
+  "planned_solves": {
+    "initial": 600,
+    "bayesian_optimisation": 600,
+    "random_search": 1200,
+    "sweep": 1215
+  },
+  "estimated_wall_hours": {
+    "initial": 0.09399797460916696,
+    "bayesian_optimisation": 0.09399797460916696,
+    "random_search": 0.18799594921833393,
+    "sweep": 0.1903458985835631
+  },
+  "workers": 4,
+  "decision": "proceed with planned grid"
+}
