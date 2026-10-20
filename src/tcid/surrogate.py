@@ -73,9 +73,10 @@ def features(agg: pd.DataFrame, space: DesignSpace) -> np.ndarray:
 class GPSurrogate:
     name = "gaussian_process"
 
-    def __init__(self, n_restarts: int = 2, seed: int = 0):
+    def __init__(self, n_restarts: int = 2, seed: int = 0, normalize_y: bool = True):
         self.n_restarts = n_restarts
         self.seed = seed
+        self.normalize_y = normalize_y
         self.model = None
         self.fit_time_s = 0.0
 
@@ -85,11 +86,16 @@ class GPSurrogate:
         kernel = ConstantKernel(1.0, (1e-3, 1e3)) * Matern(
             length_scale=np.full(d, 0.5), length_scale_bounds=(1e-2, 1e2), nu=2.5
         ) + WhiteKernel(1e-5, (1e-9, 1e-1))
-        alpha = 1e-8 if noise_var is None else np.maximum(noise_var, 1e-8)
+        # GaussianProcessRegressor(normalize_y=True) standardises y but adds ``alpha`` to the kernel
+        # diagonal *in standardised units*; observation variances given in units of y must therefore
+        # be divided by var(y) (numpy default ddof=0, as scikit-learn uses). Omitting this made the
+        # supplied seed noise ~39x too small for the Phase 1 loop data (fixed in v0.2.0).
+        y_var = float(np.var(y)) if self.normalize_y else 1.0
+        alpha = 1e-8 if noise_var is None else np.maximum(np.asarray(noise_var) / max(y_var, 1e-300), 1e-8)
         self.model = GaussianProcessRegressor(
             kernel=kernel,
             alpha=alpha,
-            normalize_y=True,
+            normalize_y=self.normalize_y,
             n_restarts_optimizer=self.n_restarts,
             random_state=self.seed,
         )

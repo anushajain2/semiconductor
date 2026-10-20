@@ -400,3 +400,103 @@ def validate(g: Geometry, n_vertices: int = 256) -> dict:
         "gap_ok": gap_ok,
         "valid": bool(inside.all() and gap_ok),
     }
+
+
+# ----------------------------------------------------------------------------- failure categories
+
+FAILURE_KINDS = {
+    "geometric_constraint": "particles cannot fit in the layer under the stated size/margin rules",
+    "generator_budget": "sequential random placement exhausted its attempt budget (not proof of impossibility)",
+    "loading_discreteness": "the target loading cannot be matched by whole particles from this size distribution",
+    "mesh": "meshing or mesh-quality rejection",
+    "solve": "solver failure",
+    "other": "other failure",
+}
+
+
+def classify_failure(stage: str, reason: str) -> str:
+    """Separate 'our generator failed' from 'this geometry cannot exist under the stated rules'."""
+    r = (reason or "").lower()
+    if stage.startswith("geometry"):
+        if "truncated" in r or "does not fit" in r or "cannot fit" in r:
+            return "geometric_constraint"
+        if "packing infeasible" in r:
+            return "generator_budget"
+        if "not attainable" in r:
+            return "loading_discreteness"
+        return "other"
+    if stage.startswith("mesh"):
+        return "mesh"
+    if stage == "solve":
+        return "solve"
+    return "other"
+
+
+# ----------------------------------------------------------------------------- second packing strategy
+
+LATTICE_VERSION = "shelf-1.0"
+
+
+def construct_shelf(design: Design, layer: Layer, gs: GeometrySettings, seed: int) -> Geometry:
+    """Deterministic shelf (row) packing used as a *feasibility* check.
+
+    The same particle population and orientations as :func:`generate` are drawn, then
+    particles are placed in rows by their rotated bounding boxes, separated by at least the
+    minimum gap (box separation >= gap implies ellipse separation >= gap). Slack is spread
+    evenly. The result is an ordered arrangement: it shows that a valid arrangement exists
+    when sequential random placement gave up, but it is NOT statistically equivalent to a
+    random microstructure and must not be mixed with randomly placed realizations.
+    """
+    base = Geometry(design=design.to_dict(), layer=layer.to_dict(), settings=gs.to_dict(), seed=int(seed),
+                    generator_version=LATTICE_VERSION, status="rejected")
+    tm = truncated_mass(design, layer, gs)
+    if tm > gs.max_truncated_mass:
+        base.reason = f"size distribution truncated by {tm:.1%}; particles cannot fit in the layer"
+        return base
+    rng = np.random.default_rng(_design_seed(design, seed).spawn(1)[0])
+    d_eq, reason = _sample_population(rng, design, layer, gs)
+    if d_eq is None:
+        base.reason = reason
+        return base
+    a, b = semi_axes(d_eq, design.aspect)
+    th = sample_orientations(rng, d_eq.size, design.order, design.preferred_angle)
+    ex, ey = half_extents(a, b, th)
+    g, m = gs.min_gap, layer.margin
+    W, T = layer.width - 2 * m, layer.thickness - 2 * m
+    order = np.argsort(-ey)
+    rows, cur, x = [], [], 0.0
+    for i in order:
+        w = 2 * ex[i]
+        if cur and x + w > W + 1e-15:
+            rows.append(cur)
+            cur, x = [], 0.0
+        if w > W + 1e-15:
+            base.reason = "a particle is wider than the layer interior"
+            return base
+        cur.append(i)
+        x += w + g
+    if cur:
+        rows.append(cur)
+    heights = [2 * ey[r].max() for r in rows]
+    total = sum(heights) + g * (len(rows) - 1)
+    if total > T + 1e-15:
+        base.reason = f"shelf construction needs {total * 1e6:.1f} um of {T * 1e6:.1f} um interior thickness"
+        return base
+    # spread slack only *between* rows/particles, so every separation stays >= the minimum gap
+    vgap = (T - sum(heights)) / (len(rows) - 1) if len(rows) > 1 else 0.0
+    cx, cy = np.empty(d_eq.size), np.empty(d_eq.size)
+    y = m if len(rows) > 1 else m + (T - heights[0]) / 2
+    for r, h in zip(rows, heights):
+        widths = 2 * ex[r]
+        hgap = (W - widths.sum()) / (len(r) - 1) if len(r) > 1 else 0.0
+        xx = m if len(r) > 1 else m + (W - widths.sum()) / 2
+        for i in r:
+            cx[i] = xx + ex[i]
+            cy[i] = y + h / 2
+            xx += 2 * ex[i] + hgap
+        y += h + vgap
+    out = Geometry(**{**base.__dict__})
+    out.status, out.reason = "ok", ""
+    out.cx, out.cy, out.a, out.b, out.theta = cx, cy, a, b, th
+    out.stats = {"truncated_mass": tm, **describe(out), "construction": "shelf"}
+    return out

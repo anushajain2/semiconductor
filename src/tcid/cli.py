@@ -108,7 +108,10 @@ def cmd_stage(name):
             out = s.final()
         elif name == "questions":
             s.q1_q4_grid()
-            out = {"q1": s.q1(), "q1_crossings": s.q1_crossings(), "q4": s.q4(), "q2": s.q2(), "q3": s.q3()}
+            out = {"q1": s.q1(), "q1_crossings": s.q1_crossings(), "q4": s.q4(), "q2": s.q2(), "q3": s.q3(),
+                   "feasibility": s.feasibility()}
+        elif name == "bo-v2":
+            out = s.search_bo_v2()
         elif name == "gate":
             out = s.gate()
         else:
@@ -148,6 +151,14 @@ def cmd_recommend(a):
     return 0 if res["supported"] else 3
 
 
+def cmd_benchmark(a):
+    from .benchmark import run_benchmark
+
+    res = run_benchmark(_study(a))
+    print(json.dumps({k: v for k, v in res.items() if k != "environment"}, indent=2))
+    return 0 if res["matches_stored_results"] and res["verification_gates_pass"] else 1
+
+
 def cmd_all(a):
     for step in (cmd_verify, cmd_stage("pilot"), cmd_stage("initial"), cmd_stage("search"), cmd_stage("final"),
                  cmd_stage("questions"), cmd_stage("gate"), cmd_figures, cmd_report):
@@ -179,9 +190,10 @@ def main(argv=None) -> int:
     s = sub.add_parser("solve")
     s.add_argument("case")
     s.set_defaults(fn=cmd_solve)
-    for name in ("pilot", "initial", "surrogate", "search", "final", "questions", "gate"):
+    for name in ("pilot", "initial", "surrogate", "search", "bo-v2", "final", "questions", "gate"):
         sub.add_parser(name).set_defaults(fn=cmd_stage(name))
     sub.add_parser("figures").set_defaults(fn=cmd_figures)
+    sub.add_parser("benchmark", help="reproducibility benchmark (run from a clean tagged checkout)").set_defaults(fn=cmd_benchmark)
     sub.add_parser("report").set_defaults(fn=cmd_report)
     r = sub.add_parser("recommend")
     r.add_argument("--material", default="alumina_epoxy_dev_2d")

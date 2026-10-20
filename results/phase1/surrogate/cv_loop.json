@@ -2,12 +2,12 @@
   "gaussian_process": {
     "n_points": 385,
     "n_designs": 77,
-    "median_rel_error": 0.040938522990028536,
-    "p90_rel_error": 0.12780413833237966,
-    "max_rel_error": 0.4166265194457551,
-    "median_rel_error_low_resistance_quartile": 0.03407951450937029,
-    "coverage_95": 0.8467532467532467,
-    "spearman_within_scenario_mean": 0.8916504548083495
+    "median_rel_error": 0.018512937062265762,
+    "p90_rel_error": 0.04929469144254297,
+    "max_rel_error": 0.13100360214509946,
+    "median_rel_error_low_resistance_quartile": 0.015276317823581872,
+    "coverage_95": 0.8831168831168831,
+    "spearman_within_scenario_mean": 0.9461485882538515
   },
   "extra_trees": {
     "n_points": 385,

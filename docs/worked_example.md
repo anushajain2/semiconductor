@@ -60,7 +60,7 @@ a CSV of per-scenario resistances and a statement of the modelled domain.
 
 - The top row is only the mechanical pick. Every candidate marked `~` is statistically unresolved from it, and the confirmed values of the aspect-ratio-4 designs span only 178.5–185.0 mm²K/W.
 - With no thermal basis for choosing, the tool says to choose on other grounds. Two of them come from the simulation itself:
-  * **Thickness flexibility.** The 24 µm pick cannot be packed into a 50 µm or 60 µm layer: its particles do not fit, as the run below shows. The ~10 µm designs fit thinner layers.
+  * **Thickness flexibility.** The 24 µm pick cannot be used in a 50 µm or 60 µm layer: its particles are longer than the size rules allow, as the run below shows. The ~10 µm designs fit thinner layers.
   * **Variability.** The 24 µm pick varies most from one realization to the next (± 3.0 vs about ± 0.9). Its advantage also drops to 0.44× if the particle size runs 20% larger than specified.
 - A team that might use the adhesive in several bond-line thicknesses would reasonably buy a ~10 µm grade, such as `sweep_best`.
 
@@ -75,7 +75,7 @@ a CSV of per-scenario resistances and a statement of the modelled domain.
 - With identical outer contacts the ranking cannot change, only the size of the benefit.
 - For this 100 µm layer the assembly benefit is 20% [17–24%] with ideal contacts. It stays above 10% until the two contacts together reach about 220 mm²K/W (95% interval 144–299).
 - Even the bottom of that interval is more than twice the assumed range for well-made contacts (up to about 60 mm²K/W).
-- Thicker layers tolerate even more contact resistance. Thin bond lines could not be evaluated with these designs, because they do not pack into 50 µm.
+- Thicker layers tolerate even more contact resistance. Thin bond lines could not be evaluated: the recommended distribution does not fit in 50 µm, and the generator failed for part of the medium design's realizations there.
 
 ## Outside the verified domain
 
@@ -83,7 +83,7 @@ a CSV of per-scenario resistances and a statement of the modelled domain.
 tcid recommend --thickness "60 um" --loading 0.25 --run
 ```
 
-The tool answers `UNSUPPORTED REQUEST`, because the thickness and loading are outside the verified set. With `--run` it also tries to solve the verified recommendation at the new conditions, clearly labelled *not re-optimised*. Here it reports that the recommended distribution cannot be packed at all at 60 µm. That is a concrete reason not to transfer this recommendation to thinner bond lines without a new study.
+The tool answers `UNSUPPORTED REQUEST`, because the thickness and loading are outside the verified set. With `--run` it also tries to solve the verified recommendation at the new conditions, clearly labelled *not re-optimised*. Here it reports that the recommended distribution cannot be placed at all at 60 µm under the size rules. That is a concrete reason not to transfer this recommendation to thinner bond lines without a new study.
 
 ## What this example does not say
 

@@ -30,38 +30,91 @@ DOMAIN_TEXT = (
 )
 
 
-def _verified_domain(study) -> dict:
+PHYSICAL_KEYS = ("k_matrix", "k_filler_par", "k_filler_perp", "r_interface", "r_top", "r_bottom")
+
+
+def _close(a: float, b: float, rel: float = 1e-9) -> bool:
+    return abs(a - b) <= rel * max(abs(a), abs(b), 1e-300)
+
+
+def verified_inputs(out) -> dict | None:
+    """Physical inputs actually used by the stored verification/confirmation solves.
+
+    Requests are compared against these values (what was simulated), never against names.
+    """
+    p = Path(out) / "final" / "final_rows.parquet"
+    if not p.exists():
+        return None
+    rows = pd.read_parquet(p)
+    rows = rows[rows["tag"].isin(["final", "confirm"]) & (rows["status"] == "ok")]
+    scen = {}
+    for name, g in rows.groupby("scenario"):
+        first = g.iloc[0]
+        vals = {k: float(first[k]) for k in PHYSICAL_KEYS}
+        for k in PHYSICAL_KEYS:  # every solve of a scenario must have used identical inputs
+            if not all(_close(float(v), vals[k]) for v in g[k]):
+                raise ValueError(f"stored results are inconsistent for scenario {name!r}, input {k}")
+        scen[name] = vals
+    one = rows.iloc[0]
     return {
-        "material": study.material.name,
-        "thickness_m": [study.cfg.layer.thickness],
-        "loading_levels": [float(x) for x in study.cfg.design_space["loading_levels"]],
-        "scenarios": sorted(s.name for s in study.scenarios),
+        "scenarios": scen,
+        "layer": {k: float(one[k]) for k in ("thickness", "width", "margin")},
+        "min_gap": float(one["min_gap_setting"]),
+        "loading_levels": sorted({float(v) for v in rows["loading_target"]}),
+        "material_name": str(one["material"]),
+        "k_matrix_nominal": float(one["k_matrix_nominal"]),
     }
+
+
+def check_request(study, out, material: str, thickness: float, loading: float, scenarios_path) -> list[str]:
+    """Compare the complete requested configuration with the configuration that produced the
+    stored results. Any difference in a physical value makes the request unsupported."""
+    from .materials import load_scenarios, params_for
+
+    v = verified_inputs(out)
+    if v is None:
+        return ["no verified study results found; run `tcid all` first"]
+    problems = []
+    if material != v["material_name"] or material != study.material.name:
+        problems.append(f"material case '{material}' is not supported (verified: '{v['material_name']}')")
+    if not _close(study.material.k_matrix, v["k_matrix_nominal"]):
+        problems.append("the material file's matrix conductivity differs from the one used for the stored results")
+    lay = study.cfg.layer
+    if not _close(thickness, v["layer"]["thickness"]):
+        problems.append(f"thickness {thickness * 1e6:.1f} um differs from the verified {v['layer']['thickness'] * 1e6:.1f} um")
+    for k in ("width", "margin"):
+        if not _close(getattr(lay, k), v["layer"][k]):
+            problems.append(f"layer {k} in the study config differs from the stored results")
+    if not _close(study.cfg.geometry.min_gap, v["min_gap"]):
+        problems.append("minimum particle gap in the study config differs from the stored results")
+    if not any(_close(loading, x) for x in v["loading_levels"]):
+        problems.append(f"loading {loading} not among the verified loading levels {v['loading_levels']}")
+    try:
+        req = load_scenarios(scenarios_path, study.material)
+    except Exception as exc:  # noqa: BLE001
+        return problems + [f"unreadable scenario file: {exc}"]
+    for sc in req:
+        mp = params_for(study.material, sc)
+        got = {"k_matrix": mp.k_matrix, "k_filler_par": mp.k_filler_par, "k_filler_perp": mp.k_filler_perp,
+               "r_interface": sc.r_interface, "r_top": sc.r_top, "r_bottom": sc.r_bottom}
+        match = [n for n, ref in v["scenarios"].items() if all(_close(got[k], ref[k]) for k in PHYSICAL_KEYS)]
+        if not match:
+            ref = v["scenarios"].get(sc.name)
+            diff = ", ".join(f"{k}={got[k]:.3g} (verified {ref[k]:.3g})" for k in PHYSICAL_KEYS
+                             if ref and not _close(got[k], ref[k])) if ref else "no verified scenario has these values"
+            problems.append(f"scenario '{sc.name}' was not simulated with these inputs: {diff}")
+    return problems
 
 
 def recommend(out, material, thickness, loading, scenarios, out_dir, run_if_unsupported=False,
               config="configs/study_phase1.yaml", cache="cache", workers=None) -> dict:
-    from .materials import load_scenarios
     from .studies import Study
 
     study = Study(config, out, cache, workers)
     t = to_si(thickness)
-    dom = _verified_domain(study)
-    try:
-        req_scen = sorted(s.name for s in load_scenarios(scenarios, study.material))
-    except Exception as exc:  # noqa: BLE001
-        req_scen = [f"unreadable scenario file: {exc}"]
-    problems = []
-    if material != dom["material"]:
-        problems.append(f"material case '{material}' is not supported (verified: '{dom['material']}')")
-    if not any(abs(t - x) < 1e-9 for x in dom["thickness_m"]):
-        problems.append(f"thickness {t * 1e6:.0f} um outside the verified set {[round(x * 1e6, 3) for x in dom['thickness_m']]} um")
-    if not any(abs(loading - x) < 1e-9 for x in dom["loading_levels"]):
-        problems.append(f"loading {loading} not among the verified loading levels {dom['loading_levels']}")
-    if not set(req_scen) <= set(dom["scenarios"]):
-        problems.append(f"scenario set {req_scen} is not a subset of the verified scenarios {dom['scenarios']}")
+    problems = check_request(study, out, material, t, loading, scenarios)
     final_path = Path(out) / "final" / "final.json"
-    if not final_path.exists():
+    if not final_path.exists() and not any("no verified study results" in p for p in problems):
         problems.append("no verified study results found; run `tcid all` first")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -69,7 +122,7 @@ def recommend(out, material, thickness, loading, scenarios, out_dir, run_if_unsu
     if problems:
         text = "UNSUPPORTED REQUEST\n  - " + "\n  - ".join(problems) + "\n" + DOMAIN_TEXT
         res = {"supported": False, "problems": problems, "text": text}
-        if run_if_unsupported and final_path.exists() and material == dom["material"]:
+        if run_if_unsupported and final_path.exists() and material == study.material.name:
             res.update(_run_outside_domain(study, t, loading, out_dir))
             res["text"] += "\n\n" + res["run_text"]
         (out_dir / "response.json").write_text(json.dumps(res, indent=2, default=str))
@@ -116,8 +169,9 @@ def recommend(out, material, thickness, loading, scenarios, out_dir, run_if_unsu
         if p["label"] != "baseline (random orientation)":
             safe = p["label"].split("+")[0]
             cfg = {
-                "material": str(study.cfg.resolve(study.cfg.material_path)),
-                "scenarios": str(study.cfg.resolve(study.cfg.scenarios_path)),
+                # repository-relative paths: `tcid solve` is run from the repository root
+                "material": study.cfg.material_path,
+                "scenarios": study.cfg.scenarios_path,
                 "design": {**d, "d50": f"{d['d50'] * 1e6:.4f} um"},
                 "seed": int(fin["seeds"][0]),
                 "layer": {k: f"{v * 1e6:g} um" for k, v in study.cfg.layer.to_dict().items()},

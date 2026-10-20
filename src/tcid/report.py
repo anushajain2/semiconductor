@@ -213,25 +213,78 @@ def write_report(study) -> Path:
           f"{pilot['n_elements_max'] / 1e3:.0f}k). Decision: {pilot['decision']}.")
         w("")
     if comp:
-        w("| Method | Designs (complete / requested) | Solver calls | CPU h | Best robust R, loop seeds (mm²K/W) | Calls to within 1% of overall best |")
-        w("|---|---|---|---|---|---|")
+        w("Simulation count, compute and simplicity are reported separately. CPU hours include geometry, meshing and "
+          "solves of accepted designs, CPU spent on rejected designs, and (BO only) surrogate training and acquisition.")
+        w("")
+        w("| Method | Designs (complete / requested) | Solver calls | Calls to within 1% of overall best | "
+          "CPU h, accepted | CPU h, rejected | CPU h, surrogate | CPU h, total | Best robust R, loop seeds (mm²K/W) |")
+        w("|---|---|---|---|---|---|---|---|---|")
         for k in ("bayesian_optimisation", "random_search", "sweep"):
             c = comp[k]
             w(f"| {k.replace('_', ' ')} | {c['n_designs_complete']} / {c['n_designs_requested']} | {c['solver_calls']} | "
-              f"{c['cpu_hours']:.2f} | {_um2(c['best_robust'])} | {c['calls_to_within_1pct_of_overall_best'] or 'never'} |")
+              f"{c['calls_to_within_1pct_of_overall_best'] or 'never'} | {c['cpu_hours']:.2f} | "
+              f"{c.get('failed_work_cpu_hours', float('nan')):.3f} | {c.get('surrogate_overhead_hours', 0):.3f} | "
+              f"{c.get('total_cpu_hours', c['cpu_hours']):.2f} | {_um2(c['best_robust'])} |")
         w("")
-        if "failures_by_tag_and_stage" in comp:
-            w("Rejected geometries/meshes (excluded from optimisation, reported here): "
-              + ", ".join(f"{k}: {v}" for k, v in comp["failures_by_tag_and_stage"].items()) + ".")
-            w("")
-    for name, cv in (("initial design (40 designs)", cv_i), ("full loop data (initial + BO)", cv_l)):
-        if cv:
-            g, t = cv["gaussian_process"], cv["extra_trees"]
-            w(f"Surrogate held-out error, {name}, folds split by design: GP median {g['median_rel_error']:.2%} "
-              f"(p90 {g['p90_rel_error']:.2%}, low-resistance quartile {g['median_rel_error_low_resistance_quartile']:.2%}, "
-              f"95% interval coverage {g['coverage_95']:.0%}, within-scenario Spearman {g['spearman_within_scenario_mean']:.3f}); "
-              f"extra-trees median {t['median_rel_error']:.2%}. Target < 5%: {'met' if cv['meets_target'] else 'NOT met'}.")
-            w("")
+        w("The sweep reached the target in fewer solver calls than BO but used more CPU in total, because its grid "
+          "includes expensive corner designs and more rejected ones. \"Fewer solver calls\" is supported; \"cheaper\" "
+          "is not.")
+        w("")
+    feas = _j(o / "questions" / "feasibility.json")
+    if feas:
+        fk = feas.get("failure_counts_by_kind", {})
+        w("**Rejected geometries, by cause.** Exhausting the attempt budget of random sequential placement is not proof "
+          "that no valid arrangement exists, so the categories are kept separate: "
+          + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in fk.items())
+          + " (unique rejected jobs across all stages). For the excluded cases that matter to the conclusions a second "
+          "strategy (deterministic shelf packing of the same particles, gap-checked) was tried:")
+        w("")
+        w("| Excluded case | Random placement | Shelf construction | Verdict |")
+        w("|---|---|---|---|")
+        for name, c in feas["cases"].items():
+            w(f"| {name} | {c['rsa_ok']}/{c['n_seeds']} placed | {c['shelf_ok']}/{c['n_seeds']} valid | {c['verdict']} |")
+        w("")
+        ob = feas["orientation_bias_check"]
+        w(f"Conditioning on successful placement does not measurably distort orientation: across "
+          f"{ob['accepted_geometries']} accepted geometries the realized minus target orientation order is "
+          f"{ob['mean_realized_minus_target_order']:+.4f} ± {ob['se']:.4f}, and only {ob['geometries_needing_restarts']} "
+          "needed a placement restart. Exclusion of whole designs, not distortion within accepted ones, is the larger "
+          "effect. Note also that a design is dropped from a study if any of its realizations fails, which is "
+          "conservative: e.g. the 6 µm-margin variant in Q3 was dropped although 11 of 12 realizations placed.")
+        w("")
+    cv_i0 = _j(o / "surrogate" / "cv_initial_v1_uncorrected.json")
+    cv_l0 = _j(o / "surrogate" / "cv_loop_v1_uncorrected.json")
+    if cv_l0:
+        w("**Surrogate noise-scaling defect (found in review, fixed in v0.2.0).** The GP was fitted with "
+          "`normalize_y=True` while per-point seed noise was supplied in unnormalized log-resistance units, about 39× "
+          "too small; the fitted white-noise term sat at its lower bound, so noisy 3-seed means were treated as nearly "
+          "exact. The original BO campaign and the uncorrected cross-validation are kept as recorded.")
+        w("")
+        w("| Data | GP median error (v1 → fixed) | GP p90 error | GP 95% coverage | Extra-trees median |")
+        w("|---|---|---|---|---|")
+        for name, a, b in (("initial design", cv_i0, cv_i), ("full loop data", cv_l0, cv_l)):
+            if a and b:
+                ga, gb = a["gaussian_process"], b["gaussian_process"]
+                w(f"| {name} | {ga['median_rel_error']:.2%} → {gb['median_rel_error']:.2%} | "
+                  f"{ga['p90_rel_error']:.2%} → {gb['p90_rel_error']:.2%} | {ga['coverage_95']:.0%} → {gb['coverage_95']:.0%} | "
+                  f"{b['extra_trees']['median_rel_error']:.2%} |")
+        w("")
+    bv2 = _j(o / "search" / "bo_v2_evaluation.json")
+    if bv2:
+        w("**Corrected-surrogate BO campaign (methods follow-up; plan fixed in `docs/gate_v2.md` before running).** "
+          f"Same initial design, budget and settings: {bv2['n_designs']} designs, {bv2['solver_calls']} solver calls, "
+          f"{bv2['cpu_hours']:.2f} CPU h plus {bv2['training_acquisition_hours']:.3f} h surrogate overhead; best loop value "
+          f"{_um2(bv2['best_robust_loop'])} mm²K/W. Its best-of-four ({bv2['pick']}) confirmed at "
+          f"{_um2(bv2['confirmed_robust'])} ± {_um2(bv2['confirmed_robust_se'])} mm²K/W on the 12 confirmation seeds. "
+          "Differences from the frozen confirmed picks (other − corrected BO; 95% Welch CI; Holm p):")
+        w("")
+        w("| Comparison | Difference (mm²K/W) | 95% CI | p (Holm) |")
+        w("|---|---|---|---|")
+        for k, v in bv2["comparisons_on_confirmation_batch"].items():
+            w(f"| {k.replace('_', ' ')} | {_um2(v['diff'])} | [{_um2(v['ci_low'])}, {_um2(v['ci_high'])}] | {v['p_holm']:.3f} |")
+        w("")
+        w("One campaign per method; the Phase 1 recommendation is frozen and is not re-opened by this campaign.")
+        w("")
     w("![Search efficiency](figures/fig5_search_efficiency.png)")
     w("")
     w("![Surrogate parity](figures/fig6_surrogate_parity.png)")
@@ -332,8 +385,10 @@ def write_report(study) -> Path:
             w("")
             if qc.get("infeasible_small_sizes_um"):
                 w(f"Smaller particles ({', '.join(f'{v:.1f}' for v in qc['infeasible_small_sizes_um'])} µm) with this width, "
-                  "shape and alignment could not be packed at the study loading and minimum gap; the small rung is the "
-                  f"smallest packable size. Ladder (µm): " + ", ".join(f"{k} {v:.1f}" for k, v in qc["d50_um"].items()) + ".")
+                  "shape and alignment were not placed by the random sequential placement generator, so the small rung "
+                  "is the smallest size it placed. The shelf construction shows valid arrangements of those smaller "
+                  "particles exist (see the feasibility table), so this is a generator limitation. Ladder (µm): "
+                  + ", ".join(f"{k} {v:.1f}" for k, v in qc["d50_um"].items()) + ".")
                 w("")
             w("| Pair | Crossing estimate (m²K/W) | 95% interval | Better below the crossing | Status |")
             w("|---|---|---|---|---|")
@@ -436,6 +491,11 @@ def write_report(study) -> Path:
           "Where a cheaper direct search was not resolved worse, the guide's rule applies and it is retained; each method "
           "was run once, so this says nothing about the methods in general.")
         w("")
+    w("The Phase 1 gate result above stands as recorded. Its exact-winner criterion is poorly matched to nearly tied, "
+      "noisy candidates, so a replacement (gate v2: retained baseline advantage plus bounded uncertainty relative to "
+      "alternatives) was written down in `docs/gate_v2.md` before any further runs. It applies from Phase 2 and is not "
+      "used to re-decide Phase 1.")
+    w("")
     w("## 8 Limits and failed assumptions")
     w("")
     w("* 2D cross-sections cannot represent 3D connectivity; area fraction is not volume fraction. Phase 2 (3D oblate platelets, BN tensor) is required before any BN claim.")

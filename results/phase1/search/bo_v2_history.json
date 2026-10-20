@@ -1,0 +1,232 @@
+[
+  {
+    "iteration": 1,
+    "train_time_s": 4.189449256999978,
+    "acquisition_time_s": 2.2940902389998428,
+    "kernel": "8.15**2 * Matern(length_scale=[4.34, 29.5, 0.963, 9.03, 2.8, 76.2], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017929579771545464,
+    "design_ids": [
+      "1a8fa334a448",
+      "7a2db73f894e",
+      "3f166364a6f2",
+      "afce60c1f818"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 44,
+    "n_failed_designs": 0,
+    "pool": 5332,
+    "max_ei": 9.386944594614029e-06
+  },
+  {
+    "iteration": 2,
+    "train_time_s": 3.826698250999925,
+    "acquisition_time_s": 1.9390445159999672,
+    "kernel": "5.63**2 * Matern(length_scale=[3.42, 11.2, 0.851, 7.34, 2.53, 59.4], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "3dacdbb6e6f1",
+      "935598815326",
+      "89810c953e4c",
+      "f1369cc64cf4"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 48,
+    "n_failed_designs": 0,
+    "pool": 5376,
+    "max_ei": 2.4590355539527687e-06
+  },
+  {
+    "iteration": 3,
+    "train_time_s": 3.8785538349998205,
+    "acquisition_time_s": 1.9442915390000053,
+    "kernel": "4.57**2 * Matern(length_scale=[3.1, 2.01, 2.68, 3.24, 2.58, 45.9], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "32827981c6fd",
+      "bcaf116d22dd",
+      "e28688f70cc0",
+      "e8876bdb9d3f"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 52,
+    "n_failed_designs": 0,
+    "pool": 5352,
+    "max_ei": 9.668930538286046e-07
+  },
+  {
+    "iteration": 4,
+    "train_time_s": 5.598858783999958,
+    "acquisition_time_s": 2.1307036539999444,
+    "kernel": "4.49**2 * Matern(length_scale=[2.86, 1.9, 2.18, 4.05, 2.65, 48.9], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "1871597241af",
+      "0e558dc9a448",
+      "9cd76834b8ef",
+      "e907b03ff1a2"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 56,
+    "n_failed_designs": 0,
+    "pool": 5354,
+    "max_ei": 9.056979032459523e-10
+  },
+  {
+    "iteration": 5,
+    "train_time_s": 3.8702315860000454,
+    "acquisition_time_s": 2.346446415999935,
+    "kernel": "6.26**2 * Matern(length_scale=[3.32, 13, 0.943, 8.16, 3, 74.2], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "ce5ec94523ee",
+      "02566fdfe59e",
+      "e625c8a37086",
+      "37b30be64454"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 60,
+    "n_failed_designs": 0,
+    "pool": 5337,
+    "max_ei": 0.0
+  },
+  {
+    "iteration": 6,
+    "train_time_s": 7.322023762000072,
+    "acquisition_time_s": 2.5461080839997976,
+    "kernel": "4.47**2 * Matern(length_scale=[2.71, 2.09, 2.19, 4.41, 2.73, 51.1], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "5653daf88ea4",
+      "7687c3b49508",
+      "4693bd8cde6a",
+      "2be3a12493bf"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 64,
+    "n_failed_designs": 0,
+    "pool": 5341,
+    "max_ei": 0.0
+  },
+  {
+    "iteration": 7,
+    "train_time_s": 10.111670988000014,
+    "acquisition_time_s": 2.5539467420001074,
+    "kernel": "5.12**2 * Matern(length_scale=[2.61, 2.45, 2.16, 4.77, 3, 58], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "142090ec3bee",
+      "9516037f295c",
+      "eeb2bf5e5bf2",
+      "1dbd20eb804e"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 67,
+    "n_failed_designs": 1,
+    "pool": 5343,
+    "max_ei": 8.588024536343464e-09
+  },
+  {
+    "iteration": 8,
+    "train_time_s": 8.46804708600007,
+    "acquisition_time_s": 3.0132625290000306,
+    "kernel": "4.75**2 * Matern(length_scale=[2.71, 2.1, 2.19, 4.32, 2.9, 54.9], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "21e36e86c0ef",
+      "1ff913580bf1",
+      "af0b0d3c2f6c",
+      "9085add752fc"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 71,
+    "n_failed_designs": 1,
+    "pool": 5341,
+    "max_ei": 0.0
+  },
+  {
+    "iteration": 9,
+    "train_time_s": 6.917666043000054,
+    "acquisition_time_s": 2.044520594000005,
+    "kernel": "5.18**2 * Matern(length_scale=[2.81, 2.27, 2.43, 4.52, 2.96, 59.4], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "ef66da211827",
+      "34883b8e23c5",
+      "119b35b5ed55",
+      "b0e47bba3e5b"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 75,
+    "n_failed_designs": 1,
+    "pool": 5345,
+    "max_ei": 0.0
+  },
+  {
+    "iteration": 10,
+    "train_time_s": 10.591231021000112,
+    "acquisition_time_s": 3.4062286850000874,
+    "kernel": "5.38**2 * Matern(length_scale=[3.08, 2.43, 2.55, 4.5, 2.97, 59.7], nu=2.5) + WhiteKernel(noise_level=1e-09)",
+    "best_robust": 0.00017460077659539556,
+    "design_ids": [
+      "497b87156c14",
+      "21c4f5c3c5d2",
+      "e8f6b24a68d9",
+      "cfc6a5ada4ba"
+    ],
+    "kinds": [
+      "ei",
+      "ei",
+      "ei",
+      "explore"
+    ],
+    "n_designs": 79,
+    "n_failed_designs": 1,
+    "pool": 5337,
+    "max_ei": 0.0
+  }
+]

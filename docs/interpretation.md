@@ -9,7 +9,7 @@ These findings describe a 2D layer, 100 µm thick, with filler area fraction 0.3
 * "Not resolved" means no difference was detected. It does not mean the designs are equivalent.
 * The candidates were chosen on a 6-seed verification batch. Their quoted values come from a separate 12-seed confirmation batch, because the minimum of several noisy values is biased low.
 
-**Revision note.** This revision follows an external review. Several earlier statements were weaker than they read: the size crossovers, the contact-resistance threshold, the claimed "statistical equivalence" of BO and the sweep, the uncertainty table, and the measurement-priority wording. Section 8 lists what changed.
+**Revision notes.** Version 0.1.1 followed a first external review and version 0.2.0 a second one (section 9). Several earlier statements were weaker than they read: the size crossovers, the contact-resistance threshold, the claimed "statistical equivalence" of BO and the sweep, the uncertainty table, and the measurement-priority wording. Section 8 lists what changed.
 
 1. **Aligning elongated particles is a large, well-resolved benefit. It is the one firm design conclusion.**
    * Every optimised candidate is elongated (aspect ratio 3.3–4) and at least partly aligned (orientation order 0.56–0.95). The eight BO and sweep candidates all have aspect ratio 4 and order 0.84–0.95.
@@ -24,7 +24,7 @@ These findings describe a 2D layer, 100 µm thick, with filler area fraction 0.3
    * The recommended design sits at a corner of the design space (largest size, narrowest width, highest aspect ratio and alignment). It also has the largest realization-to-realization spread. It cannot be used in a 50 µm layer (its particles do not fit), and its advantage falls to 0.44× when particle size is scaled up by 20%.
    * Among the unresolved designs, a ~10 µm design such as `sweep_best` (179.3 ± 0.9) is less variable and fits thinner layers. These are legitimate grounds for choosing between designs the simulation cannot separate.
 3. **Particle size versus interface resistance: the direction is robust, the location is not.** (Q1; 12 seeds; dense grid)
-   * The size ladder is 5, 11 and 20 µm, all with the recommended width, shape and alignment. Smaller sizes (4 and 4.5 µm) could not be packed at this loading and minimum gap.
+   * The size ladder is 5, 11 and 20 µm, all with the recommended width, shape and alignment. Smaller sizes (4 and 4.5 µm) were excluded because the random sequential placement generator ran out of attempts. A deterministic shelf construction later showed that valid arrangements of those particles do exist, so the exclusion was a generator limitation, not physical impossibility.
    * At low interface resistance, smaller particles are better. As interface resistance rises, their penalty grows steadily. This trend is consistent across seeds and well resolved.
    * The estimated crossings, with 95% intervals:
      * small vs medium: 7.4e-7 m²K/W [4.9e-7, 1.0e-6]
@@ -38,25 +38,27 @@ These findings describe a 2D layer, 100 µm thick, with filler area fraction 0.3
    * Even its lower bound is more than twice the assumed realistic range (≤ 60 mm²K/W in total).
    * The earlier figure of 331 came from a separate 4-seed batch. It is not reproducible from the main table, and it has been replaced.
    * The threshold rises with thickness. For the medium pair it goes from 292 [238, 348] at 100 µm to 478 [438, 519] at 150 µm.
-   * The pre-registered 50 µm comparison could not be made. The recommended distribution does not fit, and the medium pair failed to pack in 3 of 12 (aligned) and 7 of 12 (random) realizations.
+   * The pre-registered 50 µm comparison could not be made. The recommended distribution genuinely does not fit: its particles are longer than the size rules allow in a 50 µm layer. For the medium pair, the generator failed in 3 of 12 (aligned) and 7 of 12 (random) realizations while placing the rest, so its exclusion is a generator limitation combined with the conservative rule that drops a design if any realization fails.
    * The series formula R_top + R_layer + R_bottom underestimates Robin contact solves by up to 3.0% for the large-particle design (1.2% for the medium pair).
 5. **Robustness of the recommended design to geometric perturbations.** (Q3; 12 seeds)
    * The reference advantage is 17.2% (t = 7.6).
    * It is insensitive to orientation: lowering the order by 0.1 or 0.2 gives 0.99× and 1.05× of the reference. The pre-registered "smooth decrease" was not observed, but neither was a collapse.
    * It is insensitive to minimum gap (0.82–1.26×), lateral domain width (0.95×) and a thinner margin (1.10×).
    * It is sensitive to larger particles (size ×1.2 gives 0.44×) and to a wider size distribution (0.69×).
-   * A 6 µm resin margin could not be packed for this design.
+   * The 6 µm resin-margin variant was dropped because 1 of 12 realizations failed to place; the other 11 placed.
 6. **Which input each decision is sensitive to, conditionally.** (Q4)
    * Within the reference ranges, the spread of "baseline − candidate" (the value of aligning) is almost entirely explained by the achieved orientation: 98–100%. The interface and filler-conductivity shares are both ≈ 0%, so their relative order is not meaningful.
    * Widening the interface range to 1e-5 m²K/W moves the interface share to 18% (recommended design) and 39% (medium design).
-   * For the size decision, the large − small difference varies only with interface resistance. But orientation was *not varied* there, because the small design could not be packed at reduced orientation.
+   * For the size decision, the large − small difference varies only with interface resistance. But orientation was *not varied* there, because the generator did not place the small design at reduced orientation.
    * These are sensitivity shares that depend on the chosen ranges, grid weighting and independence assumptions. They indicate which uncertainty matters to which decision. They do not say which measurement is worth buying, because measurement cost, accuracy and decision impact are not modelled.
 7. **Search methods: one campaign each.**
    * Each method's best-of-four design was verified, then confirmed on 12 independent seeds: BO 182.9 ± 0.8, random search 191.4 ± 1.0, sweep 178.5 ± 3.0 mm²K/W.
    * BO is resolved better than random search in this campaign: random − BO = 8.4 mm²K/W [5.8, 11.1], Holm p < 0.001.
    * The sweep comparison is unresolved: sweep − BO = −4.5 [−11.1, +2.2]. The sweep also reached within 1% of the best loop value in fewer solver calls (585 vs 1020).
-   * Because each method ran once, none of this generalises to the methods themselves, and "unresolved" is not equivalence. Following the guide, the cheaper sweep is retained for Phase 1.
-   * The GP surrogate met the 5% held-out target (4.1% median), but its 95% intervals covered only 85% of points. A small extra-trees ensemble was more accurate (1.8%).
+   * Because each method ran once, none of this generalises to the methods themselves, and "unresolved" is not equivalence.
+   * Cost has to be stated by measure. The sweep needed fewer solver calls to reach the target (585 vs 1020), but it used more CPU in total: 0.77 h vs 0.44 h for BO, counting rejected work and surrogate overhead. The sweep is simpler, not cheaper.
+   * The GP had a defect, found in the second review. Per-point seed noise was supplied in the wrong units, about 39× too small, so the GP treated noisy 3-seed means as nearly exact. Fixing it cut the held-out median error from 4.1% to 1.85% and the 90th percentile from 12.8% to 4.9%. Coverage of the 95% intervals rose from 85% to 88%, still below nominal.
+   * A pre-planned rerun of BO with the corrected GP (same budget and seeds) confirmed its best-of-four at 182.8 ± 1.3 mm²K/W, indistinguishable from the original BO pick (difference 0.1, 95% CI −3.2 to +3.4). The defect therefore did not change what BO found. The Phase 1 recommendation stays frozen.
 
 ### Phase 2 gate
 
@@ -87,3 +89,14 @@ The scenarios are hand-chosen stress cases, so every "worst case" above is a str
 | Self-comparison row and the "2 SE" rule | The self-comparison is removed. Welch tests with Holm correction replace the 2 SE screen; confirmation-batch values are quoted to remove selection bias. |
 | Measurement-priority wording | Reframed as conditional sensitivity shares, with range variants that show how the shares move; no measurement recommendation is made. |
 | Verification ahead of validation | Unchanged and agreed: all properties remain assumed, and Phase 2 (BN case, 3D platelets) is required before any material claim. |
+
+### 9 What changed after the second review (v0.2.0)
+
+| Review point | Change |
+|---|---|
+| The recommendation interface matched scenarios by name | Requests are now compared value-by-value with the physical inputs actually used for the stored solves (scenario conductivities and resistances, layer, minimum gap, loading, material). The reviewer's case (every interface resistance set to 1e-3 m²K/W, names unchanged) is now rejected; regression tests cover it plus a changed conductivity, a changed thickness and a renamed but identical scenario. |
+| GP noise scaling with `normalize_y=True` | Noise is divided by var(y). Uncorrected cross-validation is kept (`*_v1_uncorrected`). A single pre-planned BO campaign with the fix was run and evaluated on the existing confirmation seeds; the recommendation is frozen. |
+| Generator failure vs physical impossibility | Every failure now carries a category (geometric constraint, generator budget, loading discreteness, mesh, solve) and its CPU time. A deterministic shelf-packing construction checks the excluded cases: 4 and 4.5 µm turned out feasible (a generator limitation); the recommended design at 50 µm is impossible under the size rules. No orientation bias from conditioning on successful placement was detected (−0.002 ± 0.003). |
+| Reproducibility | Exported configurations use repository-relative paths. A LICENSE file and CI test workflow were added. A `tcid benchmark` command recomputes a subset of stored solves without the cache from a clean, tagged commit and checks they match exactly. The earlier results were produced from dirty working trees; the benchmark ties them to tagged source. |
+| "Cheaper" sweep | Calls, CPU (accepted work, rejected work, surrogate overhead) and simplicity are reported separately. The sweep is not cheaper. |
+| Gate design | The Phase 1 gate failure stands. A replacement gate (retained baseline advantage plus bounded uncertainty relative to alternatives) was written down in `docs/gate_v2.md` before any new runs; it applies from Phase 2. |

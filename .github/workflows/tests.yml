@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: System libraries required by the gmsh wheel
+        run: sudo apt-get update && sudo apt-get install -y libglu1-mesa libxcursor1 libxinerama1 libxft2 libxrender1
+      - name: Install pinned environment
+        run: |
+          pip install -r requirements-lock.txt
+          pip install -e . --no-deps
+      - name: Unit, solver-gate and regression tests
+        run: pytest -q

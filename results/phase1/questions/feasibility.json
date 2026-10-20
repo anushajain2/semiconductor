@@ -1,0 +1,207 @@
+{
+  "failure_kinds": {
+    "geometric_constraint": "particles cannot fit in the layer under the stated size/margin rules",
+    "generator_budget": "sequential random placement exhausted its attempt budget (not proof of impossibility)",
+    "loading_discreteness": "the target loading cannot be matched by whole particles from this size distribution",
+    "mesh": "meshing or mesh-quality rejection",
+    "solve": "solver failure",
+    "other": "other failure"
+  },
+  "cases": {
+    "small rung 4.0 um (recommended shape)": {
+      "rsa": {
+        "2000": "packing infeasible: particle 408/473 could not be placed after 3 restarts",
+        "2001": "packing infeasible: particle 413/472 could not be placed after 3 restarts",
+        "2002": "packing infeasible: particle 406/467 could not be placed after 3 restarts"
+      },
+      "shelf": {
+        "2000": "valid",
+        "2001": "valid",
+        "2002": "valid"
+      },
+      "n_seeds": 3,
+      "rsa_ok": 0,
+      "shelf_ok": 3,
+      "verdict": "feasible: valid arrangements exist (0/3 by random placement, 3/3 by shelf construction); the remaining failures are generator limitations, not shown impossible"
+    },
+    "small rung 4.5 um (recommended shape)": {
+      "rsa": {
+        "2000": "packing infeasible: particle 339/370 could not be placed after 3 restarts",
+        "2001": "packing infeasible: particle 347/371 could not be placed after 3 restarts",
+        "2002": "packing infeasible: particle 342/372 could not be placed after 3 restarts"
+      },
+      "shelf": {
+        "2000": "valid",
+        "2001": "valid",
+        "2002": "valid"
+      },
+      "n_seeds": 3,
+      "rsa_ok": 0,
+      "shelf_ok": 3,
+      "verdict": "feasible: valid arrangements exist (0/3 by random placement, 3/3 by shelf construction); the remaining failures are generator limitations, not shown impossible"
+    },
+    "recommended at 50 um": {
+      "rsa": {
+        "6000": "size distribution truncated by 100.0% (> 10%) to fit the layer; requested distribution is incompatible with the layer dimensions",
+        "6001": "size distribution truncated by 100.0% (> 10%) to fit the layer; requested distribution is incompatible with the layer dimensions",
+        "6002": "size distribution truncated by 100.0% (> 10%) to fit the layer; requested distribution is incompatible with the layer dimensions"
+      },
+      "shelf": {
+        "6000": "size distribution truncated by 100.0%; particles cannot fit in the layer",
+        "6001": "size distribution truncated by 100.0%; particles cannot fit in the layer",
+        "6002": "size distribution truncated by 100.0%; particles cannot fit in the layer"
+      },
+      "n_seeds": 3,
+      "rsa_ok": 0,
+      "shelf_ok": 0,
+      "verdict": "impossible under the stated size rules (particles longer than the layer allows)"
+    },
+    "medium pair candidate at 50 um": {
+      "rsa": {
+        "6000": "ok",
+        "6001": "ok",
+        "6002": "ok",
+        "6003": "ok",
+        "6004": "ok",
+        "6005": "packing infeasible: particle 14/16 could not be placed after 3 restarts",
+        "6006": "ok",
+        "6007": "ok",
+        "6008": "ok",
+        "6009": "packing infeasible: particle 15/16 could not be placed after 3 restarts",
+        "6010": "packing infeasible: particle 13/16 could not be placed after 3 restarts",
+        "6011": "ok"
+      },
+      "shelf": {
+        "6000": "shelf construction needs 44.4 um of 44.0 um interior thickness",
+        "6001": "shelf construction needs 45.9 um of 44.0 um interior thickness",
+        "6002": "shelf construction needs 44.7 um of 44.0 um interior thickness",
+        "6003": "shelf construction needs 45.5 um of 44.0 um interior thickness",
+        "6004": "shelf construction needs 45.0 um of 44.0 um interior thickness",
+        "6005": "shelf construction needs 45.9 um of 44.0 um interior thickness",
+        "6006": "shelf construction needs 45.5 um of 44.0 um interior thickness",
+        "6007": "shelf construction needs 45.5 um of 44.0 um interior thickness",
+        "6008": "shelf construction needs 45.7 um of 44.0 um interior thickness",
+        "6009": "shelf construction needs 45.2 um of 44.0 um interior thickness",
+        "6010": "shelf construction needs 45.0 um of 44.0 um interior thickness",
+        "6011": "shelf construction needs 44.9 um of 44.0 um interior thickness"
+      },
+      "n_seeds": 12,
+      "rsa_ok": 9,
+      "shelf_ok": 0,
+      "verdict": "feasible: valid arrangements exist (9/12 by random placement, 0/12 by shelf construction); the remaining failures are generator limitations, not shown impossible"
+    },
+    "medium pair baseline at 50 um": {
+      "rsa": {
+        "6000": "ok",
+        "6001": "packing infeasible: particle 15/16 could not be placed after 3 restarts",
+        "6002": "ok",
+        "6003": "packing infeasible: particle 16/16 could not be placed after 3 restarts",
+        "6004": "packing infeasible: particle 16/16 could not be placed after 3 restarts",
+        "6005": "packing infeasible: particle 12/16 could not be placed after 3 restarts",
+        "6006": "packing infeasible: particle 12/16 could not be placed after 3 restarts",
+        "6007": "packing infeasible: particle 13/16 could not be placed after 3 restarts",
+        "6008": "ok",
+        "6009": "ok",
+        "6010": "packing infeasible: particle 14/16 could not be placed after 3 restarts",
+        "6011": "ok"
+      },
+      "shelf": {
+        "6000": "shelf construction needs 45.7 um of 44.0 um interior thickness",
+        "6001": "shelf construction needs 50.6 um of 44.0 um interior thickness",
+        "6002": "shelf construction needs 49.3 um of 44.0 um interior thickness",
+        "6003": "shelf construction needs 50.8 um of 44.0 um interior thickness",
+        "6004": "shelf construction needs 56.9 um of 44.0 um interior thickness",
+        "6005": "shelf construction needs 52.0 um of 44.0 um interior thickness",
+        "6006": "shelf construction needs 48.9 um of 44.0 um interior thickness",
+        "6007": "shelf construction needs 46.8 um of 44.0 um interior thickness",
+        "6008": "shelf construction needs 49.0 um of 44.0 um interior thickness",
+        "6009": "shelf construction needs 47.7 um of 44.0 um interior thickness",
+        "6010": "shelf construction needs 47.1 um of 44.0 um interior thickness",
+        "6011": "shelf construction needs 56.1 um of 44.0 um interior thickness"
+      },
+      "n_seeds": 12,
+      "rsa_ok": 5,
+      "shelf_ok": 0,
+      "verdict": "feasible: valid arrangements exist (5/12 by random placement, 0/12 by shelf construction); the remaining failures are generator limitations, not shown impossible"
+    },
+    "recommended with 6 um margin": {
+      "rsa": {
+        "4000": "ok",
+        "4001": "ok",
+        "4002": "ok",
+        "4003": "ok",
+        "4004": "ok",
+        "4005": "packing infeasible: particle 12/13 could not be placed after 3 restarts",
+        "4006": "ok",
+        "4007": "ok",
+        "4008": "ok",
+        "4009": "ok",
+        "4010": "ok",
+        "4011": "ok"
+      },
+      "shelf": {
+        "4000": "shelf construction needs 94.8 um of 88.0 um interior thickness",
+        "4001": "shelf construction needs 96.8 um of 88.0 um interior thickness",
+        "4002": "shelf construction needs 94.2 um of 88.0 um interior thickness",
+        "4003": "shelf construction needs 93.6 um of 88.0 um interior thickness",
+        "4004": "shelf construction needs 99.7 um of 88.0 um interior thickness",
+        "4005": "shelf construction needs 99.1 um of 88.0 um interior thickness",
+        "4006": "shelf construction needs 95.1 um of 88.0 um interior thickness",
+        "4007": "shelf construction needs 97.5 um of 88.0 um interior thickness",
+        "4008": "valid",
+        "4009": "valid",
+        "4010": "shelf construction needs 96.8 um of 88.0 um interior thickness",
+        "4011": "shelf construction needs 96.7 um of 88.0 um interior thickness"
+      },
+      "n_seeds": 12,
+      "rsa_ok": 11,
+      "shelf_ok": 2,
+      "verdict": "feasible: valid arrangements exist (11/12 by random placement, 2/12 by shelf construction); the remaining failures are generator limitations, not shown impossible"
+    }
+  },
+  "illustrative_constructed_4um": {
+    "note": "ordered shelf arrangement; NOT comparable with randomly placed realizations",
+    "solves": [
+      {
+        "seed": 2000,
+        "scenario": "nominal",
+        "r_layer": 0.0002264272183665313
+      },
+      {
+        "seed": 2000,
+        "scenario": "poor_iface_low_kf",
+        "r_layer": 0.0002452111632039107
+      },
+      {
+        "seed": 2001,
+        "scenario": "nominal",
+        "r_layer": 0.00021935285497320375
+      },
+      {
+        "seed": 2001,
+        "scenario": "poor_iface_low_kf",
+        "r_layer": 0.00023946880348026778
+      },
+      {
+        "seed": 2002,
+        "scenario": "nominal",
+        "r_layer": 0.00022490646978959032
+      },
+      {
+        "seed": 2002,
+        "scenario": "poor_iface_low_kf",
+        "r_layer": 0.00024401404789116827
+      }
+    ]
+  },
+  "orientation_bias_check": {
+    "accepted_geometries": 564,
+    "mean_realized_minus_target_order": -0.0015932923844462442,
+    "se": 0.0034781735870853094,
+    "geometries_needing_restarts": 4
+  },
+  "failure_counts_by_kind": {
+    "generator_budget": 58,
+    "geometric_constraint": 42
+  }
+}

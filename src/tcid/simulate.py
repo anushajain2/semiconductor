@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from .config import Design, GeometrySettings, Layer, MeshSettings
-from .geometry import GENERATOR_VERSION, generate, validate
+from .geometry import GENERATOR_VERSION, classify_failure, generate, validate
 from .materials import MaterialCase, Scenario, params_for
 from .mesh import MESHER_VERSION, MeshError, mesh_particles
 from .provenance import code_version, config_hash
@@ -111,7 +111,8 @@ def _base_row(job: Job) -> dict:
 
 
 def _failure(job: Job, stage: str, reason: str, extra: dict | None = None) -> dict:
-    return {**_base_row(job), "status": "failed", "stage": stage, "reason": reason, **(extra or {})}
+    return {**_base_row(job), "status": "failed", "stage": stage, "reason": reason,
+            "failure_kind": classify_failure(stage, reason), **(extra or {})}
 
 
 def run_job(job: Job, cache_dir: str | None = None, fields_dir: str | None = None) -> tuple[list[dict], list[dict]]:
@@ -124,6 +125,7 @@ def run_job(job: Job, cache_dir: str | None = None, fields_dir: str | None = Non
         if fcache.exists():
             f = json.loads(fcache.read_text())
             f["tag"] = job.tag
+            f.setdefault("failure_kind", classify_failure(f.get("stage", ""), f.get("reason", "")))
             return [], [f]
         for sc in job.scenarios:
             p = cache / "runs" / f"{job.run_key(sc)}.json"
@@ -144,7 +146,8 @@ def run_job(job: Job, cache_dir: str | None = None, fields_dir: str | None = Non
     failures: list[dict] = []
 
     def fail(stage, reason, extra=None):
-        f = _failure(job, stage, reason, extra)
+        # CPU spent on rejected work counts toward a campaign's cost
+        f = _failure(job, stage, reason, {**(extra or {}), "elapsed_s": time.perf_counter() - t_job})
         if cache is not None:
             (cache / "failures").mkdir(parents=True, exist_ok=True)
             (cache / "failures" / f"{job.job_key()}.json").write_text(json.dumps(f, default=float))
