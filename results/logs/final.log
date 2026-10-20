@@ -1,28 +1,38 @@
-  [7/78 jobs, 2s]
-  [14/78 jobs, 2s]
-  [21/78 jobs, 2s]
-  [28/78 jobs, 2s]
-  [35/78 jobs, 3s]
-  [42/78 jobs, 3s]
-  [49/78 jobs, 19s]
-  [56/78 jobs, 19s]
-  [63/78 jobs, 20s]
-  [70/78 jobs, 29s]
-  [77/78 jobs, 35s]
-  final: 78 jobs, 390 solves, 0 failures, 35s
-  [1/2 jobs, 9s]
-  [2/2 jobs, 9s]
-  final-fields: 2 jobs, 2 solves, 0 failures, 9s
-  [1/4 jobs, 30s]
-  [2/4 jobs, 30s]
-  [3/4 jobs, 30s]
-  [4/4 jobs, 30s]
-  final-refine: 4 jobs, 20 solves, 0 failures, 31s
+  [15/150 jobs, 3s]
+  [30/150 jobs, 5s]
+  [45/150 jobs, 70s]
+  [60/150 jobs, 106s]
+  [75/150 jobs, 142s]
+  [90/150 jobs, 142s]
+  [105/150 jobs, 153s]
+  [120/150 jobs, 231s]
+  [135/150 jobs, 237s]
+  [150/150 jobs, 275s]
+  final: 150 jobs, 750 solves, 0 failures, 275s
+  [12/120 jobs, 11s]
+  [24/120 jobs, 22s]
+  [36/120 jobs, 59s]
+  [48/120 jobs, 74s]
+  [60/120 jobs, 164s]
+  [72/120 jobs, 206s]
+  [84/120 jobs, 237s]
+  [96/120 jobs, 287s]
+  [108/120 jobs, 323s]
+  [120/120 jobs, 326s]
+  confirm: 120 jobs, 600 solves, 0 failures, 327s
+  [1/2 jobs, 3s]
+  [2/2 jobs, 3s]
+  final-fields: 2 jobs, 2 solves, 0 failures, 3s
   [1/4 jobs, 7s]
   [2/4 jobs, 7s]
   [3/4 jobs, 7s]
   [4/4 jobs, 7s]
-  final-coarse: 4 jobs, 20 solves, 0 failures, 8s
+  final-refine: 4 jobs, 20 solves, 0 failures, 8s
+  [1/4 jobs, 3s]
+  [2/4 jobs, 3s]
+  [3/4 jobs, 3s]
+  [4/4 jobs, 3s]
+  final-coarse: 4 jobs, 20 solves, 0 failures, 3s
 {
   "seeds": [
     1000,
@@ -109,56 +119,53 @@
         "preferred_angle": 1.5707963267948966
       }
     },
+    "random_search_2": {
+      "design_id": "ff9082f955bf",
+      "robust": 0.00019391176940499027,
+      "robust_se": 1.540876990655732e-06,
+      "nominal": 0.0001821513924168223,
+      "nominal_se": 1.5652923061663464e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.1195048590155352e-05,
+        "sigma_ln": 0.06785888830655001,
+        "aspect": 3.4049932152756197,
+        "order": 0.9120673711748672,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_3": {
+      "design_id": "5f537f1c71c8",
+      "robust": 0.00020403935608010444,
+      "robust_se": 2.138367008494624e-06,
+      "nominal": 0.0001926739700201731,
+      "nominal_se": 2.2214988371468003e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.2619240739110178e-05,
+        "sigma_ln": 0.13300053910096052,
+        "aspect": 3.2784833958424175,
+        "order": 0.7198061312924693,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_4": {
+      "design_id": "1d3ec0555e56",
+      "robust": 0.00019906249121653616,
+      "robust_se": 1.3356589253214445e-06,
+      "nominal": 0.00018434758302939827,
+      "nominal_se": 1.4009613263053517e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 7.561808352061971e-06,
+        "sigma_ln": 0.28359431892319553,
+        "aspect": 3.2957421498355677,
+        "order": 0.8637203482910226,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
     "sweep_best": {
       "design_id": "0d99d341ddf6",
       "robust": 0.0001831139021210021,
-      "robust_se": 2.6337135313041957e-06,
-      "nominal": 0.00017209547297014814,
-      "nominal_se": 2.8394995431286035e-06,
-      "design": {
-        "loading": 0.3,
-        "d50": 9.797958971132717e-06,
-        "sigma_ln": 0.275,
-        "aspect": 4.0,
-        "order": 0.95,
-        "preferred_angle": 1.5707963267948966
-      }
-    },
-    "robust_opt__S0": {
-      "design_id": "90a73a93f768",
-      "robust": 0.00023384658613918725,
-      "robust_se": 7.428263817713131e-06,
-      "nominal": 0.00022453778009017388,
-      "nominal_se": 7.320651915378286e-06,
-      "design": {
-        "loading": 0.3,
-        "d50": 2.108874794890566e-05,
-        "sigma_ln": 0.05,
-        "aspect": 4.0,
-        "order": 0.0,
-        "preferred_angle": 1.5707963267948966
-      }
-    },
-    "shortlist_2__S0": {
-      "design_id": "6dda832e18d4",
-      "robust": 0.0002314306220490671,
-      "robust_se": 3.0940128267932807e-06,
-      "nominal": 0.00021783814327372655,
-      "nominal_se": 3.255900628699555e-06,
-      "design": {
-        "loading": 0.3,
-        "d50": 9.606185231171466e-06,
-        "sigma_ln": 0.4010878925267659,
-        "aspect": 4.0,
-        "order": 0.0,
-        "preferred_angle": 1.5707963267948966
-      }
-    },
-    "shortlist_3__S0": {
-      "design_id": "07aca1928ee7",
-      "robust": 0.00023082252342570902,
-      "robust_se": 5.0709365131897e-06,
-      "nominal": 0.00021998174985125493,
-      "nominal_se": 5.065748585858894e-06,
-      "design": {
-        "loa
+      "robust_se": 2.63371353130
+EXIT=0

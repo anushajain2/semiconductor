@@ -46,6 +46,9 @@ budget:
   explore_per_batch: 1
   sobol_seed: 20261019
   random_search_seed: 7
-  final_seeds: [1000, 1001, 1002, 1003, 1004, 1005]
+  final_seeds: [1000, 1001, 1002, 1003, 1004, 1005]          # verification batch (selection happens here)
+  confirm_seeds: [6000, 6001, 6002, 6003, 6004, 6005, 6006, 6007, 6008, 6009, 6010, 6011]  # independent confirmation
+  perturbation_seeds: [4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010, 4011]
+  crossing_seeds: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011]
   final_refinements: [0.7, 0.5]
   shortlist: 3

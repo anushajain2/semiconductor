@@ -1,0 +1,22 @@
+material: /home/user/semiconductor/configs/materials/alumina_epoxy_dev.yaml
+scenarios: /home/user/semiconductor/configs/scenarios_phase1.yaml
+design:
+  loading: 0.3
+  d50: 24.0000 um
+  sigma_ln: 0.05
+  aspect: 4.0
+  order: 0.95
+  preferred_angle: 1.5707963267948966
+seed: 1000
+layer:
+  thickness: 100 um
+  width: 200 um
+  margin: 3 um
+mesh:
+  n_across_gap: 3
+  n_perimeter: 48
+  h_bulk: 6.0e-06
+  h_min: 1.5e-07
+  face_elements_in_margin: 2
+  size_factor: 0.7
+  min_quality: 0.05

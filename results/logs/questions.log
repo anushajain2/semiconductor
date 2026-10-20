@@ -1,253 +1,308 @@
-  [3/30 jobs, 22s]
-  [6/30 jobs, 38s]
-  [9/30 jobs, 50s]
-  [12/30 jobs, 59s]
-  [15/30 jobs, 123s]
-  [18/30 jobs, 182s]
-  [21/30 jobs, 243s]
-  [24/30 jobs, 243s]
-  [27/30 jobs, 243s]
-  [30/30 jobs, 243s]
-  q1q4: 30 jobs, 810 solves, 0 failures, 243s
-  [1/8 jobs, 2s]
-  [2/8 jobs, 2s]
-  [3/8 jobs, 2s]
-  [4/8 jobs, 2s]
+  [3/39 jobs, 2s]
+  [6/39 jobs, 2s]
+  [9/39 jobs, 2s]
+  [12/39 jobs, 2s]
+  [15/39 jobs, 145s]
+  [18/39 jobs, 145s]
+  [21/39 jobs, 145s]
+  [24/39 jobs, 145s]
+  [27/39 jobs, 157s]
+  [30/39 jobs, 170s]
+  [33/39 jobs, 170s]
+  [36/39 jobs, 170s]
+  [39/39 jobs, 170s]
+  q1q4: 39 jobs, 891 solves, 6 failures, 171s
+  [3/36 jobs, 89s]
+  [6/36 jobs, 173s]
+  [9/36 jobs, 260s]
+  [12/36 jobs, 264s]
+  [15/36 jobs, 272s]
+  [18/36 jobs, 284s]
+  [21/36 jobs, 290s]
+  [24/36 jobs, 298s]
+  [27/36 jobs, 298s]
+  [30/36 jobs, 298s]
+  [33/36 jobs, 298s]
+  [36/36 jobs, 298s]
+  q1-crossings: 36 jobs, 612 solves, 0 failures, 299s
+  [2/24 jobs, 2s]
+  [4/24 jobs, 2s]
+  [6/24 jobs, 2s]
+  [8/24 jobs, 2s]
+  [10/24 jobs, 2s]
+  [12/24 jobs, 2s]
+  [14/24 jobs, 2s]
+  [16/24 jobs, 2s]
+  [18/24 jobs, 2s]
+  [20/24 jobs, 2s]
+  [22/24 jobs, 2s]
+  [24/24 jobs, 2s]
+  q2-t50: 24 jobs, 0 solves, 24 failures, 3s
+  [2/24 jobs, 2s]
+  [4/24 jobs, 2s]
+  [6/24 jobs, 2s]
+  [8/24 jobs, 2s]
+  [10/24 jobs, 2s]
+  [12/24 jobs, 2s]
+  [14/24 jobs, 2s]
+  [16/24 jobs, 2s]
+  [18/24 jobs, 2s]
+  [20/24 jobs, 2s]
+  [22/24 jobs, 2s]
+  [24/24 jobs, 2s]
+  q2-t100: 24 jobs, 120 solves, 0 failures, 2s
+  [2/24 jobs, 7s]
+  [4/24 jobs, 8s]
+  [6/24 jobs, 14s]
+  [8/24 jobs, 15s]
+  [10/24 jobs, 20s]
+  [12/24 jobs, 21s]
+  [14/24 jobs, 27s]
+  [16/24 jobs, 28s]
+  [18/24 jobs, 33s]
+  [20/24 jobs, 34s]
+  [22/24 jobs, 39s]
+  [24/24 jobs, 40s]
+  q2-t150: 24 jobs, 120 solves, 0 failures, 41s
+  [1/4 jobs, 4s]
+  [2/4 jobs, 4s]
+  [3/4 jobs, 4s]
+  [4/4 jobs, 4s]
+  q2-robin: 4 jobs, 8 solves, 0 failures, 4s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 3s]
+  [3/8 jobs, 4s]
+  [4/8 jobs, 4s]
+  [5/8 jobs, 4s]
+  [6/8 jobs, 4s]
+  [7/8 jobs, 6s]
+  [8/8 jobs, 6s]
+  q3-reference: 8 jobs, 40 solves, 0 failures, 6s
+  [1/4 jobs, 3s]
+  [2/4 jobs, 3s]
+  [3/4 jobs, 4s]
+  [4/4 jobs, 4s]
+  q3-order_minus_0.1: 4 jobs, 20 solves, 0 failures, 4s
+  [1/4 jobs, 4s]
+  [2/4 jobs, 4s]
+  [3/4 jobs, 4s]
+  [4/4 jobs, 4s]
+  q3-order_minus_0.2: 4 jobs, 20 solves, 0 failures, 4s
+  [1/8 jobs, 4s]
+  [2/8 jobs, 4s]
+  [3/8 jobs, 4s]
+  [4/8 jobs, 4s]
+  [5/8 jobs, 5s]
+  [6/8 jobs, 6s]
+  [7/8 jobs, 6s]
+  [8/8 jobs, 6s]
+  q3-d50_x0.8: 8 jobs, 40 solves, 0 failures, 6s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 3s]
+  [3/8 jobs, 3s]
+  [4/8 jobs, 3s]
   [5/8 jobs, 3s]
-  [6/8 jobs, 3s]
+  [6/8 jobs, 5s]
+  [7/8 jobs, 5s]
+  [8/8 jobs, 5s]
+  q3-d50_x1.2: 8 jobs, 40 solves, 0 failures, 5s
+  [1/8 jobs, 2s]
+  [2/8 jobs, 3s]
+  [3/8 jobs, 3s]
+  [4/8 jobs, 3s]
+  [5/8 jobs, 4s]
+  [6/8 jobs, 4s]
   [7/8 jobs, 4s]
   [8/8 jobs, 4s]
-  q2-t50: 8 jobs, 40 solves, 0 failures, 4s
-  [1/8 jobs, 8s]
-  [2/8 jobs, 8s]
-  [3/8 jobs, 8s]
-  [4/8 jobs, 8s]
-  [5/8 jobs, 13s]
-  [6/8 jobs, 13s]
-  [7/8 jobs, 14s]
-  [8/8 jobs, 14s]
-  q2-t100: 8 jobs, 40 solves, 0 failures, 14s
-  [1/8 jobs, 18s]
-  [2/8 jobs, 18s]
-  [3/8 jobs, 19s]
-  [4/8 jobs, 19s]
-  [5/8 jobs, 36s]
-  [6/8 jobs, 36s]
-  [7/8 jobs, 36s]
-  [8/8 jobs, 36s]
-  q2-t150: 8 jobs, 40 solves, 0 failures, 36s
-  [1/4 jobs, 6s]
-  [2/4 jobs, 6s]
-  [3/4 jobs, 6s]
-  [4/4 jobs, 6s]
-  q2-robin: 4 jobs, 8 solves, 0 failures, 6s
-  [1/8 jobs, 8s]
-  [2/8 jobs, 8s]
-  [3/8 jobs, 8s]
-  [4/8 jobs, 8s]
-  [5/8 jobs, 12s]
-  [6/8 jobs, 13s]
-  [7/8 jobs, 13s]
-  [8/8 jobs, 13s]
-  q3-reference: 8 jobs, 40 solves, 0 failures, 13s
-  [1/4 jobs, 7s]
-  [2/4 jobs, 7s]
-  [3/4 jobs, 8s]
-  [4/4 jobs, 8s]
-  q3-order_minus_0.1: 4 jobs, 20 solves, 0 failures, 8s
-  [1/4 jobs, 7s]
-  [2/4 jobs, 7s]
-  [3/4 jobs, 7s]
-  [4/4 jobs, 7s]
-  q3-order_minus_0.2: 4 jobs, 20 solves, 0 failures, 7s
-  [1/8 jobs, 11s]
-  [2/8 jobs, 11s]
-  [3/8 jobs, 11s]
-  [4/8 jobs, 11s]
-  [5/8 jobs, 22s]
-  [6/8 jobs, 22s]
-  [7/8 jobs, 22s]
-  [8/8 jobs, 22s]
-  q3-d50_x0.8: 8 jobs, 40 solves, 0 failures, 22s
-  [1/8 jobs, 6s]
-  [2/8 jobs, 6s]
-  [3/8 jobs, 6s]
-  [4/8 jobs, 6s]
-  [5/8 jobs, 8s]
-  [6/8 jobs, 10s]
-  [7/8 jobs, 10s]
-  [8/8 jobs, 10s]
-  q3-d50_x1.2: 8 jobs, 40 solves, 0 failures, 10s
-  [1/8 jobs, 5s]
-  [2/8 jobs, 6s]
-  [3/8 jobs, 6s]
-  [4/8 jobs, 6s]
-  [5/8 jobs, 10s]
-  [6/8 jobs, 10s]
-  [7/8 jobs, 11s]
-  [8/8 jobs, 12s]
-  q3-sigma_plus_0.1: 8 jobs, 40 solves, 0 failures, 12s
-  [1/8 jobs, 9s]
-  [2/8 jobs, 9s]
-  [3/8 jobs, 9s]
-  [4/8 jobs, 9s]
-  [5/8 jobs, 13s]
-  [6/8 jobs, 15s]
-  [7/8 jobs, 15s]
-  [8/8 jobs, 15s]
-  q3-min_gap_0.5um: 8 jobs, 40 solves, 0 failures, 15s
-  [1/8 jobs, 8s]
-  [2/8 jobs, 8s]
-  [3/8 jobs, 8s]
-  [4/8 jobs, 8s]
-  [5/8 jobs, 12s]
-  [6/8 jobs, 14s]
-  [7/8 jobs, 14s]
-  [8/8 jobs, 14s]
-  q3-min_gap_2um: 8 jobs, 40 solves, 0 failures, 14s
-  [1/8 jobs, 9s]
-  [2/8 jobs, 9s]
-  [3/8 jobs, 9s]
-  [4/8 jobs, 9s]
-  [5/8 jobs, 14s]
-  [6/8 jobs, 16s]
-  [7/8 jobs, 16s]
-  [8/8 jobs, 16s]
-  q3-margin_1.5um: 8 jobs, 40 solves, 0 failures, 16s
-  [1/8 jobs, 8s]
-  [2/8 jobs, 8s]
-  [3/8 jobs, 8s]
-  [4/8 jobs, 8s]
-  [5/8 jobs, 12s]
-  [6/8 jobs, 13s]
-  [7/8 jobs, 13s]
-  [8/8 jobs, 13s]
-  q3-margin_6um: 8 jobs, 40 solves, 0 failures, 14s
-  [1/8 jobs, 16s]
-  [2/8 jobs, 16s]
-  [3/8 jobs, 16s]
-  [4/8 jobs, 16s]
-  [5/8 jobs, 26s]
-  [6/8 jobs, 28s]
-  [7/8 jobs, 28s]
-  [8/8 jobs, 29s]
-  q3-width_x2: 8 jobs, 40 solves, 0 failures, 29s
+  q3-sigma_plus_0.1: 8 jobs, 40 solves, 0 failures, 4s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 4s]
+  [3/8 jobs, 4s]
+  [4/8 jobs, 4s]
+  [5/8 jobs, 5s]
+  [6/8 jobs, 5s]
+  [7/8 jobs, 5s]
+  [8/8 jobs, 5s]
+  q3-min_gap_0.5um: 8 jobs, 40 solves, 0 failures, 6s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 5s]
+  [3/8 jobs, 5s]
+  [4/8 jobs, 5s]
+  [5/8 jobs, 5s]
+  [6/8 jobs, 5s]
+  [7/8 jobs, 6s]
+  [8/8 jobs, 6s]
+  q3-min_gap_2um: 8 jobs, 40 solves, 0 failures, 6s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 4s]
+  [3/8 jobs, 4s]
+  [4/8 jobs, 4s]
+  [5/8 jobs, 5s]
+  [6/8 jobs, 5s]
+  [7/8 jobs, 6s]
+  [8/8 jobs, 6s]
+  q3-margin_1.5um: 8 jobs, 40 solves, 0 failures, 6s
+  [1/8 jobs, 3s]
+  [2/8 jobs, 3s]
+  [3/8 jobs, 3s]
+  [4/8 jobs, 5s]
+  [5/8 jobs, 6s]
+  [6/8 jobs, 6s]
+  [7/8 jobs, 6s]
+  [8/8 jobs, 6s]
+  q3-margin_6um: 8 jobs, 40 solves, 0 failures, 7s
+  [1/8 jobs, 4s]
+  [2/8 jobs, 5s]
+  [3/8 jobs, 5s]
+  [4/8 jobs, 5s]
+  [5/8 jobs, 7s]
+  [6/8 jobs, 7s]
+  [7/8 jobs, 8s]
+  [8/8 jobs, 8s]
+  q3-width_x2: 8 jobs, 40 solves, 0 failures, 8s
 {
   "q1": {
     "winners_supported_range": {
-      "small_particles_aligned": 24,
-      "recommended": 21
+      "medium_particles_aligned": 27,
+      "small_particles_aligned": 12,
+      "large_particles_aligned": 3,
+      "recommended": 3
     },
     "winners_all": {
-      "small_particles_aligned": 36,
-      "recommended": 27,
-      "large_particles_aligned": 18
+      "medium_particles_aligned": 39,
+      "small_particles_aligned": 18,
+      "recommended": 15,
+      "large_particles_aligned": 9
     },
     "baseline_ever_wins_supported": false,
-    "indistinguishable_fraction_supported": 1.0,
-    "reversals": [
+    "indistinguishable_fraction_supported": 0.9333333333333333,
+    "seeds_per_cell": 3,
+    "cell_test": "Welch two-sample test of winner vs runner-up, p < 0.05 (screening only, not Holm-corrected)",
+    "coarse_grid_crossings": [
+      {
+        "a": "baseline_random_orientation",
+        "b": "small_particles_aligned",
+        "between": [
+          3e-06,
+          1e-05
+        ],
+        "crossing_estimate": 4.1550114390438286e-06,
+        "better_below": "small_particles_aligned"
+      },
       {
         "a": "large_particles_aligned",
-        "b": "recommended",
+        "b": "medium_particles_aligned",
         "between": [
           1e-06,
           3e-06
-        ]
+        ],
+        "crossing_estimate": 1.6850211212542622e-06,
+        "better_below": "medium_particles_aligned"
       },
       {
         "a": "large_particles_aligned",
         "b": "small_particles_aligned",
         "between": [
-          1e-06,
-          3e-06
-        ]
+          3e-07,
+          1e-06
+        ],
+        "crossing_estimate": 8.029758272869559e-07,
+        "better_below": "small_particles_aligned"
+      },
+      {
+        "a": "medium_particles_aligned",
+        "b": "recommended",
+        "between": [
+          3e-06,
+          1e-05
+        ],
+        "crossing_estimate": 3.9535713932111946e-06,
+        "better_below": "medium_particles_aligned"
+      },
+      {
+        "a": "medium_particles_aligned",
+        "b": "small_particles_aligned",
+        "between": [
+          3e-07,
+          1e-06
+        ],
+        "crossing_estimate": 4.034554311362324e-07,
+        "better_below": "small_particles_aligned"
       },
       {
         "a": "recommended",
         "b": "small_particles_aligned",
         "between": [
-          3e-07,
-          1e-06
-        ]
+          1e-06,
+          3e-06
+        ],
+        "crossing_estimate": 1.4534014067343462e-06,
+        "better_below": "small_particles_aligned"
       }
-    ]
+    ],
+    "note": "coarse-grid crossings are crossings of sample means at 3 seeds; see q1_crossings.json for dense-grid, 12-seed bootstrap intervals"
   },
-  "q4": {
-    "recommended": {
-      "total_sd": 8.490807839557935e-06,
-      "mean": 3.260603851290721e-05,
-      "range": 2.399678017665961e-05,
-      "fraction_positive": 1.0,
-      "variance_reduction_orientation_achieved": 0.9812792140363485,
-      "variance_reduction_interface_resistance": 0.016914276526395988,
-      "variance_reduction_filler_conductivity": 8.557150448329498e-05
+  "q1_crossings": {
+    "seeds": [
+      2000,
+      2001,
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011
+    ],
+    "r_grid": [
+      1e-07,
+      1.333521432163324e-07,
+      1.7782794100389227e-07,
+      2.3713737056616554e-07,
+      3.162277660168379e-07,
+      4.2169650342858225e-07,
+      5.62341325190349e-07,
+      7.498942093324558e-07,
+      1e-06,
+      1.333521432163324e-06,
+      1.7782794100389227e-06,
+      2.3713737056616552e-06,
+      3.162277660168379e-06,
+      4.216965034285822e-06,
+      5.623413251903491e-06,
+      7.498942093324558e-06,
+      9.999999999999999e-06
+    ],
+    "d50_um": {
+      "small_particles_aligned": 5.0,
+      "medium_particles_aligned": 10.954451150103322,
+      "large_particles_aligned": 20.400000000000002
     },
-    "small_particles_aligned": {
-      "total_sd": 1.179826869485634e-05,
-      "mean": 3.292472853374507e-05,
-      "range": 3.4570448602325225e-05,
-      "fraction_positive": 1.0,
-      "variance_reduction_orientation_achieved": 0.9720689938498321,
-      "variance_reduction_interface_resistance": 0.02495881178258319,
-      "variance_reduction_filler_conductivity": 3.837056863065236e-05
-    },
-    "large_particles_aligned": {
-      "total_sd": 1.1812794388068324e-05,
-      "mean": 1.988030656254034e-05,
-      "range": 3.798438162953892e-05,
-      "fraction_positive": 1.0,
-      "variance_reduction_orientation_achieved": 0.8886011999903444,
-      "variance_reduction_interface_resistance": 0.11073258935920338,
-      "variance_reduction_filler_conductivity": 1.3469997273141132e-07
-    },
-    "large_minus_small": {
-      "total_sd": 6.042369454876453e-06,
-      "mean": 1.3044421971204726e-05,
-      "range": 2.047454169528274e-05,
-      "fraction_positive": 0.9333333333333333,
-      "variance_reduction_orientation_achieved": 0.07677086004633404,
-      "variance_reduction_interface_resistance": 0.9196347936362612,
-      "variance_reduction_filler_conductivity": 0.00012952031052237967
-    }
-  },
-  "q2": {
-    "contact_total_where_benefit_falls_to": {
-      "0.10": {
-        "50um": {
-          "good_iface_high_kf": 9.820659726702223e-05,
-          "good_iface_low_kf": 9.478143628103453e-05,
-          "nominal": 9.902455368415524e-05,
-          "poor_iface_high_kf": 0.00011531033109542758,
-          "poor_iface_low_kf": 0.00011203598873604008
-        },
-        "100um": {
-          "good_iface_high_kf": 0.00032891242113322324,
-          "good_iface_low_kf": 0.00032200858585128435,
-          "nominal": 0.00033087412915596955,
-          "poor_iface_high_kf": 0.0003659177711829598,
-          "poor_iface_low_kf": 0.00035890383800306683
-        },
-        "150um": {
-          "good_iface_high_kf": 0.00046124781606125153,
-          "good_iface_low_kf": 0.00045138412629614475,
-          "nominal": 0.00046315174917877406,
-          "poor_iface_high_kf": 0.0005050897466779613,
-          "poor_iface_low_kf": 0.0004952382818195619
-        }
-      },
-      "0.05": {
-        "50um": {
-          "good_iface_high_kf": 0.0003075357564301654,
-          "good_iface_low_kf": 0.0003021083556857181,
-          "nominal": 0.00031029708741123435,
-          "poor_iface_high_kf": 0.00035010217993933224,
-          "poor_iface_low_kf": 0.0003449000614606947
-        },
-        "100um": {
-          "good_iface_high_kf": 0.0008759534692874733,
-          "good_iface_low_kf": 0.0008654191520750692,
-          "nominal": 0.0008823507575755713,
-          "poor_iface_high_kf": 0.000968002338125539,
-          "poor_iface_low_kf": 0.0009570297348688665
-        },
-        "150um": 
+    "infeasible_small_sizes_um": [
+      4.0,
+      4.5
+    ],
+    "pairs": {
+      "small_particles_aligned|medium_particles_aligned": {
+        "estimate": 7.442039746522502e-07,
+        "ci_low": 4.878790507017731e-07,
+        "ci_high": 1.0272587291399692e-06,
+        "fraction_undefined": 0.0,
+        "n_boot": 4000,
+        "better_below": "small_particles_aligned",
+        "status": "interval straddles the supported-range limit (1e-6)",
+        "per_seed_mean_difference_at_grid": [
+          -6.635471344117172e-06,
+          -6.263941100480508e-06,
+          -5.774684194679891e-06,
+          -5.132359595704455e-06,
+          -4.292127589044939e-06,
+          -3.1976928747483833e-06,
+          -1.7792653185953928e-06,
+          4.8366669678015506e-08,
+          2.3873300243254026e-06,
+       
+EXIT=0

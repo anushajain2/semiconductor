@@ -1,7 +1,7 @@
 # Worked example: how the output changes a material-design decision
 
 > Development case only: a 2D, alumina-like isotropic filler stand-in. The *form* of the
-> decision carries over to BN; the numbers do not.
+> decision carries over to boron nitride (BN); the numbers do not.
 
 ## The situation
 
@@ -22,47 +22,60 @@ tcid recommend --material alumina_epoxy_dev_2d --thickness "100 um" --loading 0.
 ```
 
 ```
-candidate                                 d50 um  sigma    AR     S       R_robust    R_nom  vs baseline
-nominal_opt *                               6.72   0.42  4.00  0.87    180.8mm2K/W    167.5      +22.4%
-robust_opt ~                               21.09   0.05  4.00  0.84    186.9mm2K/W    179.4      +19.7%
-shortlist_2 ~                               9.61   0.40  4.00  0.95    183.6mm2K/W    172.7      +21.2%
-shortlist_3                                16.65   0.17  4.00  0.95    185.5mm2K/W    177.1      +20.3%
-baseline (random orientation)               6.72   0.42  4.00  0.00    232.8mm2K/W    215.7       +0.0%
+candidate                           d50 um  sigma    AR     S   verif.       confirmed vs ref. base
+sweep_3 *                            24.00   0.05  4.00  0.95    175.4    178.5 ±  3.0      +20.2%
+sweep_4 ~                             9.80   0.05  4.00  0.95    179.8    181.2 ±  0.9      +18.9%
+nominal_opt ~                         6.72   0.42  4.00  0.87    180.8    182.9 ±  0.8      +18.2%
+sweep_2 ~                             9.80   0.50  4.00  0.95    181.7    179.9 ±  1.4      +19.5%
+sweep_best ~                          9.80   0.28  4.00  0.95    183.1    179.3 ±  0.9      +19.8%
+shortlist_2 ~                         9.61   0.40  4.00  0.95    183.6    180.8 ±  2.1      +19.1%
+shortlist_3 ~                        16.65   0.17  4.00  0.95    185.5    179.2 ±  1.5      +19.9%
+robust_opt ~                         21.09   0.05  4.00  0.84    186.9    185.0 ±  2.2      +17.3%
+random_search_2                      11.20   0.07  3.40  0.91    193.9    191.4 ±  1.0      +14.4%
+baseline (random orientation)        24.00   0.05  4.00  0.00    237.2    223.6 ±  3.3       +0.0%
 
-* recommended;  ~ statistically indistinguishable from the recommended design (< 2 SE): choose on other grounds.
+* recommended;  ~ difference from the recommended design not resolved
 ```
 
-The tool also writes `results/recommendation/*.yaml`. These are configuration files that
-re-run any candidate with `tcid solve`. It also writes a CSV of per-scenario resistances and
-the statement of the modelled domain.
+How to read the table:
+
+- Values are worst-scenario layer resistance in mm²K/W.
+- "verif." is the 6-seed batch the candidates were chosen on.
+- "confirmed" is a separate 12-seed batch that was not used to choose anything. Quote these values.
+- The last column compares each candidate with the recommended design's own random-orientation baseline.
+
+The tool also writes `results/recommendation/*.yaml` (re-run any candidate with `tcid solve`),
+a CSV of per-scenario resistances and a statement of the modelled domain.
 
 ## What the output changes
 
-**Decision 1, alignment: yes, and it is the decision that matters.** Every aligned,
-elongated candidate (aspect ratio 4, orientation order 0.84–0.95) cuts the worst-case layer
-resistance by 19–23% relative to the same particles randomly oriented. That holds in every
-interface and filler scenario and survives fresh realisations (t = 5.6–16). The perturbation study
-(Q3) puts a price on imperfect processing: if the achieved orientation order is 0.2 lower than
-targeted, about three quarters of the benefit remains. The design map (Q1) shows that random
-orientation never wins anywhere in the scenario space. Without the tool, a team might have
-debated grades first. The tool says the alignment step is where the thermal value is.
+**Decision 1, alignment: yes. This is the decision the simulation supports firmly.**
 
-**Decision 2, grade: do not pay a premium for a particular size yet.** The recommended
-6.7 µm grade and the 9.6 µm, 16.6 µm and 21 µm alternatives lie within about 3% of each other.
-Two of them are statistically indistinguishable from the recommendation. The design map
-explains why the choice is unresolved. Smaller particles win if the particle–matrix interface
-is good (below about 6e-7 m²K/W). Larger particles win if it is poor (above about 1.5e-6).
-The value-of-information analysis (Q4) puts 92% of the size decision on interface resistance.
-The actionable output is therefore a measurement, not a grade: characterise the effective
-interface resistance of the candidate grades before choosing between them. Until then, choose
-the grade on cost, viscosity or supply.
+- Each aligned, aspect-ratio-4 candidate has 19–27% lower worst-case resistance than the same particles randomly oriented.
+- On the independent confirmation batch, the recommended design's advantage over its baseline is 45 mm²K/W (95% CI 36–54), about 20%.
+- In the perturbation study, lowering the achieved orientation order by 0.2 did not reduce the advantage of this design.
+- Random orientation never wins a cell of the design map.
 
-**Decision 3, is it worth it at all?** With identical outer contacts the ranking cannot
-change, only the size of the benefit. For this 100 µm layer the improvement in assembly
-resistance stays above 10% until the two contacts together exceed about 330 mm²K/W. That is
-far above the assumed range for well-made contacts (up to about 60 mm²K/W). For a 50 µm bond
-line the threshold falls to about 99 mm²K/W. A thin-bond-line product with poor contacts
-should fix its contacts first.
+**Decision 2, grade: the simulation cannot choose one. That is itself the useful answer.**
+
+- The top row is only the mechanical pick. Every candidate marked `~` is statistically unresolved from it, and the confirmed values of the aspect-ratio-4 designs span only 178.5–185.0 mm²K/W.
+- With no thermal basis for choosing, the tool says to choose on other grounds. Two of them come from the simulation itself:
+  * **Thickness flexibility.** The 24 µm pick cannot be packed into a 50 µm or 60 µm layer: its particles do not fit, as the run below shows. The ~10 µm designs fit thinner layers.
+  * **Variability.** The 24 µm pick varies most from one realization to the next (± 3.0 vs about ± 0.9). Its advantage also drops to 0.44× if the particle size runs 20% larger than specified.
+- A team that might use the adhesive in several bond-line thicknesses would reasonably buy a ~10 µm grade, such as `sweep_best`.
+
+**When does particle size start to matter thermally?**
+
+- Only if the particle–epoxy interface is poor. Below roughly 7–9e-7 m²K/W of interface resistance, smaller particles do slightly better; above it, larger particles do.
+- That crossover is uncertain: its 95% intervals run from about 2e-7 to 2e-6, straddling the top of the supported range.
+- So if the interface resistance of the candidate grades might be near or above 1e-6 m²K/W, characterising it is what would make size matter. Below that, the size choice has little thermal consequence.
+
+**Decision 3, is it worth it at all?**
+
+- With identical outer contacts the ranking cannot change, only the size of the benefit.
+- For this 100 µm layer the assembly benefit is 20% [17–24%] with ideal contacts. It stays above 10% until the two contacts together reach about 220 mm²K/W (95% interval 144–299).
+- Even the bottom of that interval is more than twice the assumed range for well-made contacts (up to about 60 mm²K/W).
+- Thicker layers tolerate even more contact resistance. Thin bond lines could not be evaluated with these designs, because they do not pack into 50 µm.
 
 ## Outside the verified domain
 
@@ -70,15 +83,15 @@ should fix its contacts first.
 tcid recommend --thickness "60 um" --loading 0.25 --run
 ```
 
-The tool answers `UNSUPPORTED REQUEST` and lists the reasons: the thickness and loading are
-outside the verified set. With `--run` it also solves the verified candidates at the new
-conditions, clearly labelled *not re-optimised*. Here the recommended distribution still
-beats its random-orientation baseline (134 vs 159 mm²K/W worst case, 3 seeds). That is a
-direct solver result, not a validated recommendation for that layer.
+The tool answers `UNSUPPORTED REQUEST`, because the thickness and loading are outside the verified set. With `--run` it also tries to solve the verified recommendation at the new conditions, clearly labelled *not re-optimised*. Here it reports that the recommended distribution cannot be packed at all at 60 µm. That is a concrete reason not to transfer this recommendation to thinner bond lines without a new study.
 
 ## What this example does not say
 
-It says nothing about BN, about 3D connectivity, about how alignment is achieved or what it
-costs, or about adhesion, cure, dielectric strength or reliability. Phase 2 must repeat the
-decision with 3D oriented BN platelets and a source-supported material case before any
-number above can inform a real formulation.
+It says nothing about:
+
+- boron nitride;
+- 3D connectivity;
+- how alignment is achieved, or what it costs;
+- adhesion, cure, dielectric strength or reliability.
+
+Phase 2 must repeat the decision with 3D oriented BN platelets and a source-supported material case before any number above can inform a real formulation.

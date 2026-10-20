@@ -22,70 +22,108 @@ def _um2(x):  # m^2K/W -> mm^2K/W
     return f"{x * 1e6:.1f}"
 
 
+def _ci(d, scale=1e6, fmt=".1f"):
+    return f"{d['estimate'] * scale:{fmt}} [{d['ci_low'] * scale:{fmt}}, {d['ci_high'] * scale:{fmt}}]"
+
+
 def evaluate_hypotheses(study) -> list[dict]:
+    """Grade the pre-registered hypotheses against intervals, not point estimates."""
     o = study.out
     fin = _j(o / "final" / "final.json")
     q1, q2, q3, q4 = (_j(o / "questions" / f"q{i}.json") for i in (1, 2, 3, 4))
+    qc = _j(o / "questions" / "q1_crossings.json")
+    gate = _j(o / "gate.json")
     comp = _j(o / "search" / "comparison.json")
     cands = _j(o / "final" / "candidates.json")
     out = []
-    if q1 and cands:
+
+    def grade(conds):
+        vals = [c for c in conds if c is not None]
+        if all(vals) and len(vals) == len(conds):
+            return "supported"
+        if not any(vals) and len(vals) == len(conds):
+            return "refuted"
+        return "partly supported" + (" (one clause unresolved)" if None in conds else "")
+
+    if q1 and cands and qc:
         ro = cands["recommended"]
-        aligned = {"large_particles_aligned", "small_particles_aligned", "recommended"}
-        small_large = [r for r in q1["reversals"] if {r["a"], r["b"]} <= aligned]
-        # strict reading of "at or above about 1e-6": any estimated crossing below 1e-6 counts against H1
-        rev_low = [r for r in small_large if r["crossing_estimate"] < 1e-6]
-        crossings = "; ".join(f"{r['a']} vs {r['b']} at ≈{r['crossing_estimate']:.1e} m²K/W "
-                              f"({r['better_below']} better below)" for r in small_large)
-        cond = [ro["order"] >= 0.7, ro["aspect"] >= 3.0, not q1["baseline_ever_wins_supported"], not rev_low]
-        out.append({"id": "H1", "outcome": "supported" if all(cond) else ("partly supported" if any(cond) else "refuted"),
-                    "evidence": f"recommended (verified best) design S = {ro['order']:.2f}, AR = {ro['aspect']:.2f}; baseline wins a supported-range "
-                                f"map cell: {q1['baseline_ever_wins_supported']}; small/large-particle ordering reversals: "
-                                f"{crossings or 'none'}"})
+        pairs = {k: p for k, p in qc["pairs"].items() if "estimate" in p}
+        # clause: size-ordering reversals only at or above about 1e-6
+        below = [k for k, p in pairs.items() if np.isfinite(p["ci_high"]) and p["ci_high"] < 1e-6]
+        straddle = [k for k, p in pairs.items() if "straddles" in p["status"]]
+        clause = False if below else (None if straddle else True)
+        conds = [ro["order"] >= 0.7, ro["aspect"] >= 3.0, not q1["baseline_ever_wins_supported"], clause]
+        cr = "; ".join(f"{k.replace('|', ' vs ')}: {_ci(p, 1, '.1e')} m²K/W ({p['status']})" for k, p in pairs.items())
+        out.append({"id": "H1", "outcome": grade(conds),
+                    "evidence": f"recommended design S = {ro['order']:.2f}, AR = {ro['aspect']:.2f}; random-orientation baseline wins "
+                                f"a supported-range map cell: {q1['baseline_ever_wins_supported']}; size-ordering crossings "
+                                f"(estimate [95% bootstrap interval], 12 seeds): {cr}"})
     if q2:
         b = q2["contact_total_where_benefit_falls_to"]["0.10"]
         nominal = study.nominal.name
-        stress_names = [s.name for s in study.stress]
-        r100 = b.get("100um", {})
-        worst100 = min(r100.get(s, np.inf) for s in stress_names) if r100 else np.nan
-        nom100 = r100.get(nominal, np.nan)
-        t50 = b.get("50um", {}).get(nominal, np.nan)
-        t150 = b.get("150um", {}).get(nominal, np.nan)
-        cond = [nom100 >= 3e-5, worst100 >= 3e-5, t50 < t150]
-        out.append({"id": "H2", "outcome": "supported" if all(cond) else ("partly supported" if any(cond) else "refuted"),
-                    "evidence": f"benefit reaches 10% at total contact {_um2(nom100)} mm²K/W (nominal) / {_um2(worst100)} "
-                                f"(least favourable stress scenario) for 100 µm; 50 µm: {_um2(t50)}, 150 µm: {_um2(t150)} mm²K/W"})
+        stress = [s.name for s in study.stress]
+        ref_t = f"{study.cfg.layer.thickness * 1e6:.0f}um"
+        rec = b["recommended"][ref_t]
+        rec_nom = rec[nominal]
+        rec_worst = min((rec[s] for s in stress), key=lambda d: d["ci_low"])
+        # thickness clause of H2 (50 um vs 150 um) on any pair that is feasible at both thicknesses
+        both = [p for p, d in b.items() if "50um" in d and "150um" in d]
+        if both:
+            p = both[0]
+            thick = b[p]["50um"][nominal]["ci_high"] < b[p]["150um"][nominal]["ci_low"]
+            thick_txt = f"{p}: 50 µm {_ci(b[p]['50um'][nominal])}, 150 µm {_ci(b[p]['150um'][nominal])}"
+        else:
+            thick = None
+            med = b.get("medium_particles_aligned", {})
+            trend = (f"; between 100 and 150 µm (medium pair) {_ci(med['100um'][nominal])} → {_ci(med['150um'][nominal])}"
+                     if "100um" in med and "150um" in med else "")
+            thick_txt = "50 µm clause not testable: no design pair could be packed at 50 µm (see Q2)" + trend
+        conds = [rec_nom["ci_low"] >= 3e-5, rec_worst["ci_low"] >= 3e-5, thick]
+        out.append({"id": "H2", "outcome": grade(conds),
+                    "evidence": f"total contact at which the benefit falls to 10% (estimate [95% bootstrap interval], mm²K/W), "
+                                f"recommended design at {ref_t}: nominal {_ci(rec_nom)}, least favourable stress scenario "
+                                f"{_ci(rec_worst)}; thickness trend: {thick_txt}"})
     if q3:
         av = q3["advantage_by_variant"]
         rel = {k: v["relative_to_reference"] for k, v in av.items()}
         smooth = rel.get("order_minus_0.1", 0) >= rel.get("order_minus_0.2", 0) > 0.2
         gaps = [abs(rel.get(k, np.nan) - 1) < 1 / 3 for k in ("min_gap_0.5um", "min_gap_2um") if k in rel]
-        cond = [q3["min_t_ratio_reference"] > 3, smooth, all(gaps) and bool(gaps)]
-        out.append({"id": "H3", "outcome": "supported" if all(cond) else ("partly supported" if any(cond) else "refuted"),
+        conds = [q3["min_t_ratio_reference"] > 3, smooth, all(gaps) and bool(gaps)]
+        out.append({"id": "H3", "outcome": grade(conds),
                     "evidence": f"min t-ratio on fresh seeds {q3['min_t_ratio_reference']:.1f}; advantage relative to reference: "
                                 + ", ".join(f"{k} {v:.2f}" for k, v in rel.items())})
-    if q4 and "recommended" in q4:
-        r = q4["recommended"]
-        vo, vi, vk = (r[f"variance_reduction_{k}"] for k in ("orientation_achieved", "interface_resistance", "filler_conductivity"))
-        out.append({"id": "H4", "outcome": "supported" if vo > vi > vk else ("partly supported" if vo > max(vi, vk) else "refuted"),
-                    "evidence": f"variance of (baseline - recommended) removed by knowing: orientation {vo:.0%}, interface "
-                                f"resistance {vi:.0%}, filler conductivity {vk:.0%}"})
-    if comp:
-        bo, rnd = comp["bayesian_optimisation"], comp["random_search"]
-        cb, cr = bo["calls_to_within_1pct_of_overall_best"], rnd["calls_to_within_1pct_of_overall_best"]
-        bo_wins = cb is not None and (cr is None or cb < cr)
-        gate = _j(o / "gate.json")
-        extra = ""
-        if gate and "verified_best_robust" in gate:
-            vb, vs = gate["verified_best_robust"], gate["verified_best_robust_se"]
-            extra = ("; verified on fresh seeds: " + ", ".join(f"{k.replace('_', ' ')} {_um2(vb[k])} ± {_um2(vs[k])}" for k in vb)
-                     + f" mm²K/W; BO distinguishable from random: {gate['checks']['bo_better_than_random_at_matched_budget']}, "
-                     f"from sweep: {gate['checks']['bo_better_than_sweep']}")
-        out.append({"id": "H5", "outcome": "supported" if bo_wins else "refuted",
-                    "evidence": f"solver calls to reach within 1% of the best robust value found by any method: BO {cb}, "
-                                f"random {cr}, sweep {comp['sweep']['calls_to_within_1pct_of_overall_best']}; best robust "
-                                f"(loop seeds): BO {_um2(bo['best_robust'])}, random {_um2(rnd['best_robust'])}, sweep "
-                                f"{_um2(comp['sweep']['best_robust'])} mm²K/W{extra}"})
+    if q4 and "variants" in q4:
+        def order_ok(r):
+            vo, vi, vk = (r[f"variance_reduction_{k}"] for k in ("orientation_achieved", "interface_resistance", "filler_conductivity"))
+            return vo > vi > vk
+        ref_name, ref = next(iter(q4["variants"].items()))
+        r = ref["recommended"]
+        holds = {k: order_ok(v["recommended"]) for k, v in q4["variants"].items()}
+        out.append({"id": "H4", "outcome": ("supported for the reference ranges" if order_ok(r) else "refuted")
+                    + ("" if all(holds.values()) else "; ordering changes with the ranges"),
+                    "evidence": f"sensitivity shares (reference ranges): orientation {r['variance_reduction_orientation_achieved']:.0%}, "
+                                f"interface {r['variance_reduction_interface_resistance']:.0%}, filler conductivity "
+                                f"{r['variance_reduction_filler_conductivity']:.0%}; ordering holds under range variants: "
+                                + ", ".join(f"{k.split(' (')[0]}: {v}" for k, v in holds.items())})
+    if comp and gate and fin:
+        cb, cr = (comp[k]["calls_to_within_1pct_of_overall_best"] for k in ("bayesian_optimisation", "random_search"))
+        faster = cb is not None and (cr is None or cb < cr)
+        mc = fin["method_comparison_confirmed"]
+        conf = gate["confirmed_pick_robust"]
+        conds = [faster, gate["checks"]["bo_resolved_better_than_random_this_campaign"]]
+        out.append({"id": "H5", "outcome": grade(conds) + " (single campaign per method)",
+                    "evidence": f"calls to within 1% of the best loop value: BO {cb}, random {cr or 'never'}, sweep "
+                                f"{comp['sweep']['calls_to_within_1pct_of_overall_best']}; best-of-4 per method confirmed on "
+                                f"{len(fin['confirmation_seeds'])} independent seeds: "
+                                + ", ".join(f"{k.replace('_', ' ')} {_um2(v)}" for k, v in conf.items())
+                                + " mm²K/W; random − BO "
+                                f"{_um2(mc['random_search_minus_bayesian_optimisation']['diff'])} "
+                                f"[{_um2(mc['random_search_minus_bayesian_optimisation']['ci_low'])}, "
+                                f"{_um2(mc['random_search_minus_bayesian_optimisation']['ci_high'])}]; sweep − BO "
+                                f"{_um2(mc['sweep_minus_bayesian_optimisation']['diff'])} "
+                                f"[{_um2(mc['sweep_minus_bayesian_optimisation']['ci_low'])}, "
+                                f"{_um2(mc['sweep_minus_bayesian_optimisation']['ci_high'])}] (95% Welch CI). The sweep "
+                                "comparison is unresolved, which is not evidence of equivalence."})
     return out
 
 
@@ -199,46 +237,72 @@ def write_report(study) -> Path:
     w("![Surrogate parity](figures/fig6_surrogate_parity.png)")
     w("")
     if fin:
-        w("## 5 Verified results (fresh seeds, refined mesh)")
+        w("## 5 Verified and confirmed results")
         w("")
-        w(f"Re-simulated with {len(fin['seeds'])} new geometry seeds at mesh size factor {fin['mesh_size_factor']}; "
-          "these solver results, not surrogate predictions, are the reported results.")
+        w(f"Two independent batches on the refined mesh (size factor {fin['mesh_size_factor']}): a **verification batch** "
+          f"({len(fin['selection_batch_seeds'])} new seeds) on which candidates are compared and the recommendation is chosen, and a "
+          f"**confirmation batch** ({len(fin['confirmation_seeds'])} further seeds) that re-measures the chosen designs. Choosing "
+          "the minimum of several noisy values biases it low, so the confirmation values are the ones to quote. Every search "
+          "method had its top four loop designs verified, so no method gets more chances than another.")
         w("")
-        w("| Candidate | d50 (µm) | σ_ln | AR | S | Robust R ± SE (mm²K/W) | Nominal R (mm²K/W) | Surrogate-predicted robust R |")
+        w("| Candidate | d50 (µm) | σ_ln | AR | S | Verification: robust R ± SE | Confirmation: robust R ± SE | Nominal R (verif. / conf.) |")
         w("|---|---|---|---|---|---|---|---|")
         for lab in fin["order_verified"]:
             v = fin["verified"][lab]
             d = v["design"]
+            c = fin["confirmed"].get(lab)
+            cs = f"{_um2(c['robust'])} ± {_um2(c['robust_se'])}" if c else "–"
+            nom = f"{_um2(v['nominal'])} / {_um2(c['nominal'])}" if c else _um2(v["nominal"])
             w(f"| {lab} | {d['d50'] * 1e6:.1f} | {d['sigma_ln']:.2f} | {d['aspect']:.2f} | {d['order']:.2f} | "
-              f"{_um2(v['robust'])} ± {_um2(v['robust_se'])} | {_um2(v['nominal'])} | {_um2(fin['surrogate_predicted_robust'][lab])} |")
+              f"{_um2(v['robust'])} ± {_um2(v['robust_se'])} | {cs} | {nom} |")
         w("")
-        w(f"Top-ranked finalist survives the direct solver check: **{fin['top1_survives']}**; Spearman correlation of "
-          f"predicted vs verified finalist ordering {fin['spearman_pred_vs_verified']:.2f}; loop top-1 within 2 SE of the verified "
-          f"best: {fin['top1_within_2se_of_verified_best']}. Rank correlation of nominal and worst-scenario objectives over all "
-          f"loop designs: {fin['spearman_nominal_vs_robust_loop']:.3f} (loop nominal and robust optima are the same design: "
-          f"{fin['nominal_vs_robust_same_design']}).")
+        w("Robust R is the mean resistance in the candidate's worst stress scenario (mm²K/W).")
         w("")
         rec = fin["recommended"]
-        w(f"**Recommended design: `{rec}`** (verified best robust value among optimised candidates). The loop's top-ranked "
-          f"design scored {_um2(fin['loop_top1_value_on_training_seeds'])} mm²K/W on its training seeds and "
+        w(f"**Recommended design: `{rec}`**, chosen as the lowest verification-batch robust value among the "
+          f"{len(fin['separability_from_recommended']) + 1} optimised candidates. The loop's top-ranked design scored "
+          f"{_um2(fin['loop_top1_value_on_training_seeds'])} mm²K/W on its training seeds and "
           f"{_um2(fin['loop_top1_value_on_fresh_seeds'])} on fresh seeds (selection on noisy realizations).")
         w("")
-        w("| Optimised candidate | Robust R − recommended (mm²K/W) | ± SE | Distinguishable (> 2 SE) |")
-        w("|---|---|---|---|")
-        for k, v in fin["separability_from_recommended"].items():
-            w(f"| {k} | {_um2(v['gap'])} | {_um2(v['se'])} | {'yes' if v['distinguishable'] else 'no'} |")
+        w("Which optimised candidates are resolved from the recommended one on the verification batch? Welch two-sample "
+          "tests on per-realization worst-scenario values, Holm-corrected across the family. 'Not resolved' means no "
+          "difference was detected, not that the designs are equivalent.")
+        w("")
+        w("| Candidate | Robust R − recommended (mm²K/W) | 95% CI (per comparison, unadjusted) | p (Holm) | Resolved (Holm p < 0.05) |")
+        w("|---|---|---|---|---|")
+        for k, v in sorted(fin["separability_from_recommended"].items(), key=lambda kv: kv[1]["diff"]):
+            w(f"| {k} | {_um2(v['diff'])} | [{_um2(v['ci_low'])}, {_um2(v['ci_high'])}] | {v['p_holm']:.3f} | "
+              f"{'yes' if v['resolved'] else 'no'} |")
+        w("")
+        if fin.get("confirmed_vs_recommended"):
+            w("On the independent confirmation batch (no selection), difference from the recommended design:")
+            w("")
+            w("| Candidate | Robust R − recommended (mm²K/W) | 95% Welch CI | p |")
+            w("|---|---|---|---|")
+            for k, v in sorted(fin["confirmed_vs_recommended"].items(), key=lambda kv: kv[1]["diff"]):
+                w(f"| {k} | {_um2(v['diff'])} | [{_um2(v['ci_low'])}, {_um2(v['ci_high'])}] | {v['p']:.3f} |")
+            w("")
+        rb = fin["confirmed_recommended_vs_baseline"]
+        w(f"Confirmation batch, matched random-orientation baseline minus recommended: {_um2(rb['diff'])} mm²K/W "
+          f"(95% CI [{_um2(rb['ci_low'])}, {_um2(rb['ci_high'])}], p = {rb['p']:.1e}), a {rb['rel']:.1%} reduction in the "
+          "worst stress scenario.")
+        w("")
+        w(f"Top-ranked loop finalist keeps first place on fresh seeds: **{fin['top1_survives']}**; not resolved from the "
+          f"verified best: {fin['top1_not_resolved_from_verified_best']}. Spearman correlation of surrogate-predicted vs "
+          f"verified finalist ordering {fin['spearman_pred_vs_verified']:.2f}. Rank correlation of nominal and worst-scenario "
+          f"objectives over all loop designs: {fin['spearman_nominal_vs_robust_loop']:.3f}.")
         w("")
         pdiff = o / "final" / "paired_differences.parquet"
         if pdiff.exists():
             d = pd.read_parquet(pdiff)
-            w("Candidate minus its own random-orientation baseline (matched loading, sizes and aspect ratio; same scenarios; "
-              "SE from independent realizations):")
+            w("Verification batch: each candidate minus its own random-orientation baseline (matched loading, sizes and "
+              "aspect ratio; same scenarios; Welch 95% CI from independent realizations):")
             w("")
-            w("| Candidate | Scenario | Baseline − candidate (mm²K/W) | ± SE | Relative benefit | t |")
-            w("|---|---|---|---|---|---|")
+            w("| Candidate | Scenario | Baseline − candidate (mm²K/W) | 95% CI | Relative benefit |")
+            w("|---|---|---|---|---|")
             for _, r in d.iterrows():
-                w(f"| {r['label']} | {r['scenario']} | {_um2(r['baseline_minus_candidate'])} | {_um2(r['se'])} | "
-                  f"{r['relative_benefit']:.1%} | {r['t_ratio']:.1f} |")
+                w(f"| {r['label']} | {r['scenario']} | {_um2(r['baseline_minus_candidate'])} | "
+                  f"[{_um2(r['ci_low'])}, {_um2(r['ci_high'])}] | {r['relative_benefit']:.1%} |")
             w("")
         w("![Fields](figures/fig1_fields.png)")
         w("")
@@ -253,28 +317,76 @@ def write_report(study) -> Path:
     for h in hyps:
         w(f"| {h['id']} | {h['outcome']} | {h['evidence']} |")
     w("")
+    qc = _j(o / "questions" / "q1_crossings.json")
     if q1:
         wins = ", ".join(f"{k} {v}" for k, v in q1["winners_supported_range"].items())
-        rev = "; ".join(f"{r['a']} / {r['b']} cross at ≈{r['crossing_estimate']:.1e} m²K/W ({r['better_below']} better below)"
-                        for r in q1["reversals"]) or "none"
-        w(f"**Q1, when the preferred design changes.** Map cells won within the supported interface range: {wins} "
-          f"(the random-orientation baseline wins none). {q1['indistinguishable_fraction_supported']:.0%} of those cells cannot "
-          f"separate the top two candidates at 3 seeds (< 2 SE). Ordering reversals at k_filler = 30 W/mK and full orientation: {rev}.")
+        w(f"**Q1, when the preferred design changes.** Coarse design map ({q1['seeds_per_cell']} seeds per cell): map cells won "
+          f"within the supported interface range: {wins}; the random-orientation baseline wins none. "
+          f"{q1['indistinguishable_fraction_supported']:.0%} of those cells do not resolve the winner from the runner-up "
+          "(Welch p ≥ 0.05), so the map shows where each design leads on average, not established boundaries.")
         w("")
+        if qc:
+            w(f"Targeted runs around the crossings: {len(qc['seeds'])} seeds per design, {len(qc['r_grid'])} interface "
+              "resistances from 1e-7 to 1e-5 m²K/W (k_filler = 30 W/mK, full orientation). Crossing = first sign change of the "
+              "mean-difference curve; interval = 95% percentile bootstrap over seeds.")
+            w("")
+            if qc.get("infeasible_small_sizes_um"):
+                w(f"Smaller particles ({', '.join(f'{v:.1f}' for v in qc['infeasible_small_sizes_um'])} µm) with this width, "
+                  "shape and alignment could not be packed at the study loading and minimum gap; the small rung is the "
+                  f"smallest packable size. Ladder (µm): " + ", ".join(f"{k} {v:.1f}" for k, v in qc["d50_um"].items()) + ".")
+                w("")
+            w("| Pair | Crossing estimate (m²K/W) | 95% interval | Better below the crossing | Status |")
+            w("|---|---|---|---|---|")
+            for k, p in qc["pairs"].items():
+                if "estimate" not in p:
+                    w(f"| {k.replace('|', ' vs ')} | – | – | – | {p['status']} |")
+                    continue
+                w(f"| {k.replace('|', ' vs ')} | {p['estimate']:.2e} | [{p['ci_low']:.2e}, {p['ci_high']:.2e}] | "
+                  f"{p['better_below']} | {p['status']} |")
+            w("")
+            w("![Crossings](figures/fig9_crossings.png)")
+            w("")
         w("![Design map](figures/fig2_design_map.png)")
         w("")
     if q2:
-        w("**Q2, when material optimisation is worth doing.** Total outer contact resistance at which the assembly benefit "
-          "of the recommended design over its random-orientation baseline falls to 10%:")
+        w(f"**Q2, when material optimisation is worth doing.** Computed from {len(q2['seeds'])} independent seeds per design "
+          f"on the reported mesh (size factor {q2['mesh_size_factor']}); at the reference thickness these are the "
+          "confirmation-batch values of section 5, so the numbers below can be reproduced from that table. "
+          "With identical series contacts C the relative benefit is (R_base − R_cand)/(R_base + C); the 10% threshold "
+          "C = (R_base − R_cand)/0.1 − R_base multiplies the uncertainty of the difference by ten, hence the intervals.")
         w("")
-        w("| Thickness | " + " | ".join(s.name for s in study.scenarios) + " |")
-        w("|---|" + "---|" * len(study.scenarios))
-        for t, v in q2["contact_total_where_benefit_falls_to"]["0.10"].items():
-            w(f"| {t} | " + " | ".join(_um2(v.get(s.name, float('nan'))) + " mm²K/W" for s in study.scenarios) + " |")
-        w("")
+        lt = o / "questions" / "q2_layer_resistances.parquet"
+        if lt.exists():
+            t = pd.read_parquet(lt)
+            t = t[t["scenario"] == study.nominal.name]
+            w("| Design pair | Thickness | Baseline R_layer ± SE | Candidate R_layer ± SE | Benefit at C = 0 [95% CI] | C at 10% benefit [95% CI] |")
+            w("|---|---|---|---|---|---|")
+            for _, r in t.sort_values(["pair", "thickness"]).iterrows():
+                tk = f"{r['thickness'] * 1e6:.0f}um"
+                z = q2["benefit_at_zero_contact"][r["pair"]][f"{tk}/{study.nominal.name}"]
+                c = q2["contact_total_where_benefit_falls_to"]["0.10"][r["pair"]][tk][study.nominal.name]
+                w(f"| {r['pair']} | {tk} | {_um2(r['r_baseline'])} ± {_um2(r['r_baseline_se'])} | {_um2(r['r_candidate'])} ± "
+                  f"{_um2(r['r_candidate_se'])} | {z['estimate']:.1%} [{z['ci_low']:.1%}, {z['ci_high']:.1%}] | {_ci(c)} mm²K/W |")
+            w("")
+            w("Nominal scenario shown; all scenarios are in `results/phase1/questions/q2.json`. The assumed realistic total "
+              "contact range is up to 60 mm²K/W (SR-005). The medium pair (same width, shape and alignment as the recommended "
+              "design, smaller particles) is included so that the thickness trend can be examined where the recommended "
+              "distribution does not fit.")
+            w("")
+        if q2.get("rejected_realizations"):
+            w("Rejected realizations (a pair is reported at a thickness only if every realization of both designs packed):")
+            w("")
+            for pname, roles in q2["rejected_realizations"].items():
+                for role, tks in roles.items():
+                    for tk, txt in tks.items():
+                        w(f"* {pname} ({role}), {tk}: {txt}")
+            w("")
         if q2.get("robin_vs_series_max_rel_diff") is not None:
-            w(f"The series reduction agrees with Robin contact conditions to within {q2['robin_vs_series_max_rel_diff']:.2%} "
-              "(heterogeneous layer, contacts up to 1e-4 m²K/W per face).")
+            by = q2.get("robin_vs_series_by_pair", {})
+            w(f"The series reduction R_top + R_layer + R_bottom agrees with Robin contact solves to within "
+              f"{q2['robin_vs_series_max_rel_diff']:.1%} (contacts up to 1e-4 m²K/W per face; by pair: "
+              + ", ".join(f"{k} {v:.1%}" for k, v in by.items()) + "). The larger error for the large-particle design reflects "
+              "less uniform face temperatures; the series numbers above slightly underestimate assembly resistance.")
             w("")
         w("![Contacts](figures/fig3_contacts.png)")
         w("")
@@ -292,14 +404,23 @@ def write_report(study) -> Path:
         w("![Perturbations](figures/fig7_perturbations.png)")
         w("")
     if q4:
-        w("**Q4, which unknown to resolve next.** Share of the spread of the candidate-minus-baseline difference removed by "
-          "knowing one input exactly (grid over supported ranges; conditional on the other modelled uncertainties):")
+        w("**Q4, sensitivity of each decision to each uncertain input.** Share of the spread of a decision quantity removed "
+          "by knowing one input exactly, averaged over a uniform grid of the chosen ranges (grid means over 3 seeds, so "
+          "geometry noise is part of the spread). This is a sensitivity index conditional on those ranges and on treating the "
+          "inputs as independent. It is not a value-of-information result: measurement cost, accuracy and whether the answer "
+          "would change a decision are not modelled. Decision quantities: baseline − candidate (benefit of aligning) and "
+          "large − small particles (choice of size).")
         w("")
-        w("| Decision quantity | Orientation achieved | Interface resistance | Filler conductivity | Spread (sd, mm²K/W) |")
-        w("|---|---|---|---|---|")
-        for k, r in q4.items():
-            w(f"| {k} | {r['variance_reduction_orientation_achieved']:.0%} | {r['variance_reduction_interface_resistance']:.0%} | "
-              f"{r['variance_reduction_filler_conductivity']:.0%} | {_um2(r['total_sd'])} |")
+        w("| Ranges | Decision quantity | Orientation achieved | Interface resistance | Filler conductivity | Spread (sd, mm²K/W) |")
+        w("|---|---|---|---|---|---|")
+        for vname, v in q4["variants"].items():
+            for k in ("recommended", "medium_particles_aligned", "large_minus_small"):
+                r = v[k]
+                def pct(x):
+                    return "not varied" if x != x else f"{x:.0%}"
+                w(f"| {vname} | {k} | {pct(r['variance_reduction_orientation_achieved'])} | "
+                  f"{pct(r['variance_reduction_interface_resistance'])} | {pct(r['variance_reduction_filler_conductivity'])} | "
+                  f"{_um2(r['total_sd'])} |")
         w("")
     if gate:
         w("## 7 Gate for moving to Phase 2")
@@ -311,8 +432,9 @@ def write_report(study) -> Path:
         w("")
         w(f"Proceed to Phase 2: **{gate['proceed_to_phase2']}**. Blocking (required conditions not met): "
           f"{', '.join(gate['blocking']) or 'none'}. Informational: {', '.join(gate.get('informational_unmet', [])) or 'none'}. "
-          f"Learned search earns its complexity in this 4-descriptor problem: **{gate['ml_earns_its_complexity']}** "
-          "(the guide's rule applies: an equally effective direct search is retained and reported).")
+          f"Learned search resolved better than both alternatives in this single campaign: **{gate['ml_earns_its_complexity']}**. "
+          "Where a cheaper direct search was not resolved worse, the guide's rule applies and it is retained; each method "
+          "was run once, so this says nothing about the methods in general.")
         w("")
     w("## 8 Limits and failed assumptions")
     w("")

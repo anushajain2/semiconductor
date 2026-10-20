@@ -1,38 +1,238 @@
 {
+  "definition": "1 - E[Var(delta | input)] / Var(delta) over a uniform grid of the stated ranges; grid means over 3 seeds (geometry noise included in the spread)",
+  "variants": {
+    "reference: R 1e-8..1e-6, achieved/target order 0.5-1.0": {
+      "recommended": {
+        "total_sd": 6.774617665927672e-06,
+        "mean": 2.2152395772424586e-05,
+        "range": 1.6641040729625095e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9962900560649528,
+        "variance_reduction_interface_resistance": 0.0031978297825717705,
+        "variance_reduction_filler_conductivity": 2.003986394505386e-05
+      },
+      "small_particles_aligned": {
+        "total_sd": 4.9515571763225805e-06,
+        "mean": 4.391713246364721e-05,
+        "range": 1.333251533659462e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.999976962102362,
+        "variance_reduction_filler_conductivity": 6.334050438594474e-07
+      },
+      "medium_particles_aligned": {
+        "total_sd": 1.1064887165533192e-05,
+        "mean": 2.905313315980507e-05,
+        "range": 3.1468855832104964e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9787718328495181,
+        "variance_reduction_interface_resistance": 0.020528039416141675,
+        "variance_reduction_filler_conductivity": 1.004704434759418e-06
+      },
+      "large_particles_aligned": {
+        "total_sd": 8.683214838195092e-06,
+        "mean": 2.55117656537579e-05,
+        "range": 2.1948336597556455e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9994807735388685,
+        "variance_reduction_interface_resistance": 0.00017428681600484275,
+        "variance_reduction_filler_conductivity": 6.280025965033076e-06
+      },
+      "large_minus_small": {
+        "total_sd": 5.284444751924923e-06,
+        "mean": 8.340961715427817e-06,
+        "range": 1.4229588200998612e-05,
+        "fraction_positive": 0.8,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9999720282588962,
+        "variance_reduction_filler_conductivity": 3.322757568091639e-06
+      }
+    },
+    "narrower orientation uncertainty (0.75-1.0)": {
+      "recommended": {
+        "total_sd": 1.820860152690964e-06,
+        "mean": 2.682499821516152e-05,
+        "range": 4.671271987818725e-06,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.931410708761357,
+        "variance_reduction_interface_resistance": 0.06283040876562573,
+        "variance_reduction_filler_conductivity": 0.0005145809576382332
+      },
+      "small_particles_aligned": {
+        "total_sd": 4.9515571763225805e-06,
+        "mean": 4.391713246364721e-05,
+        "range": 1.333251533659462e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.999976962102362,
+        "variance_reduction_filler_conductivity": 6.334050438594474e-07
+      },
+      "medium_particles_aligned": {
+        "total_sd": 6.115454321617179e-06,
+        "mean": 3.5990288922100375e-05,
+        "range": 1.5914702706968986e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9459318863654403,
+        "variance_reduction_interface_resistance": 0.0531310590858477,
+        "variance_reduction_filler_conductivity": 6.262287511882292e-07
+      },
+      "large_particles_aligned": {
+        "total_sd": 4.510351592515994e-06,
+        "mean": 3.107209997257317e-05,
+        "range": 9.715513415649687e-06,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9972168716268477,
+        "variance_reduction_interface_resistance": 0.0017251861319950157,
+        "variance_reduction_filler_conductivity": 9.358708586981734e-07
+      },
+      "large_minus_small": {
+        "total_sd": 5.284444751924923e-06,
+        "mean": 8.340961715427817e-06,
+        "range": 1.4229588200998612e-05,
+        "fraction_positive": 0.8,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9999720282588962,
+        "variance_reduction_filler_conductivity": 3.322757568091639e-06
+      }
+    },
+    "wider interface range (1e-8..1e-5, includes stress cases)": {
+      "recommended": {
+        "total_sd": 7.982759681048327e-06,
+        "mean": 2.3921733812575253e-05,
+        "range": 2.6325910259417053e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.802947534669256,
+        "variance_reduction_interface_resistance": 0.17680695547677916,
+        "variance_reduction_filler_conductivity": 1.4924550699180195e-05
+      },
+      "small_particles_aligned": {
+        "total_sd": 2.8400214128712817e-05,
+        "mean": 2.818723578473359e-05,
+        "range": 8.361048712081747e-05,
+        "fraction_positive": 0.8571428571428571,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9999808036212109,
+        "variance_reduction_filler_conductivity": 4.272184931708445e-06
+      },
+      "medium_particles_aligned": {
+        "total_sd": 1.5952880389767733e-05,
+        "mean": 2.35632911313727e-05,
+        "range": 6.416783585264083e-05,
+        "fraction_positive": 0.9523809523809523,
+        "variance_reduction_orientation_achieved": 0.5836572711201424,
+        "variance_reduction_interface_resistance": 0.3948446801485531,
+        "variance_reduction_filler_conductivity": 3.266201683116421e-06
+      },
+      "large_particles_aligned": {
+        "total_sd": 9.522512255813242e-06,
+        "mean": 2.6140619670004685e-05,
+        "range": 3.03126737518143e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.964189990843384,
+        "variance_reduction_interface_resistance": 0.016411932732391832,
+        "variance_reduction_filler_conductivity": 2.9913400412251434e-06
+      },
+      "large_minus_small": {
+        "total_sd": 3.138696183920563e-05,
+        "mean": -8.966203007304404e-06,
+        "range": 9.248939706713152e-05,
+        "fraction_positive": 0.5714285714285714,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9999804208170464,
+        "variance_reduction_filler_conductivity": 5.821057030952481e-06
+      }
+    },
+    "narrower interface range (1e-8..1e-7)": {
+      "recommended": {
+        "total_sd": 6.711409406264047e-06,
+        "mean": 2.1902720260412254e-05,
+        "range": 1.5849855909433325e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9999298352585322,
+        "variance_reduction_interface_resistance": 3.5549407183199655e-05,
+        "variance_reduction_filler_conductivity": 1.9849623630885382e-05
+      },
+      "small_particles_aligned": {
+        "total_sd": 5.770904047281556e-07,
+        "mean": 4.719351269919558e-05,
+        "range": 1.3860089472890935e-06,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9988810501099388,
+        "variance_reduction_filler_conductivity": 0.001092182318157664
+      },
+      "medium_particles_aligned": {
+        "total_sd": 1.0758469223732002e-05,
+        "mean": 3.0097915497445397e-05,
+        "range": 2.6775354794759205e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9997097559684387,
+        "variance_reduction_interface_resistance": 0.0002771103815313314,
+        "variance_reduction_filler_conductivity": 4.438719861665774e-07
+      },
+      "large_particles_aligned": {
+        "total_sd": 8.587677342279454e-06,
+        "mean": 2.5437576349951682e-05,
+        "range": 2.1067141100009084e-05,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": 0.9999757068308076,
+        "variance_reduction_interface_resistance": 1.7534344597391893e-06,
+        "variance_reduction_filler_conductivity": 7.556804807795636e-06
+      },
+      "large_minus_small": {
+        "total_sd": 6.113865587101928e-07,
+        "mean": 1.1834169123391178e-05,
+        "range": 1.4419354737771112e-06,
+        "fraction_positive": 1.0,
+        "variance_reduction_orientation_achieved": NaN,
+        "variance_reduction_interface_resistance": 0.9997997011488139,
+        "variance_reduction_filler_conductivity": 0.00017039987214928498
+      }
+    }
+  },
   "recommended": {
-    "total_sd": 8.490807839557935e-06,
-    "mean": 3.260603851290721e-05,
-    "range": 2.399678017665961e-05,
+    "total_sd": 6.774617665927672e-06,
+    "mean": 2.2152395772424586e-05,
+    "range": 1.6641040729625095e-05,
     "fraction_positive": 1.0,
-    "variance_reduction_orientation_achieved": 0.9812792140363485,
-    "variance_reduction_interface_resistance": 0.016914276526395988,
-    "variance_reduction_filler_conductivity": 8.557150448329498e-05
+    "variance_reduction_orientation_achieved": 0.9962900560649528,
+    "variance_reduction_interface_resistance": 0.0031978297825717705,
+    "variance_reduction_filler_conductivity": 2.003986394505386e-05
   },
   "small_particles_aligned": {
-    "total_sd": 1.179826869485634e-05,
-    "mean": 3.292472853374507e-05,
-    "range": 3.4570448602325225e-05,
+    "total_sd": 4.9515571763225805e-06,
+    "mean": 4.391713246364721e-05,
+    "range": 1.333251533659462e-05,
     "fraction_positive": 1.0,
-    "variance_reduction_orientation_achieved": 0.9720689938498321,
-    "variance_reduction_interface_resistance": 0.02495881178258319,
-    "variance_reduction_filler_conductivity": 3.837056863065236e-05
+    "variance_reduction_orientation_achieved": NaN,
+    "variance_reduction_interface_resistance": 0.999976962102362,
+    "variance_reduction_filler_conductivity": 6.334050438594474e-07
+  },
+  "medium_particles_aligned": {
+    "total_sd": 1.1064887165533192e-05,
+    "mean": 2.905313315980507e-05,
+    "range": 3.1468855832104964e-05,
+    "fraction_positive": 1.0,
+    "variance_reduction_orientation_achieved": 0.9787718328495181,
+    "variance_reduction_interface_resistance": 0.020528039416141675,
+    "variance_reduction_filler_conductivity": 1.004704434759418e-06
   },
   "large_particles_aligned": {
-    "total_sd": 1.1812794388068324e-05,
-    "mean": 1.988030656254034e-05,
-    "range": 3.798438162953892e-05,
+    "total_sd": 8.683214838195092e-06,
+    "mean": 2.55117656537579e-05,
+    "range": 2.1948336597556455e-05,
     "fraction_positive": 1.0,
-    "variance_reduction_orientation_achieved": 0.8886011999903444,
-    "variance_reduction_interface_resistance": 0.11073258935920338,
-    "variance_reduction_filler_conductivity": 1.3469997273141132e-07
+    "variance_reduction_orientation_achieved": 0.9994807735388685,
+    "variance_reduction_interface_resistance": 0.00017428681600484275,
+    "variance_reduction_filler_conductivity": 6.280025965033076e-06
   },
   "large_minus_small": {
-    "total_sd": 6.042369454876453e-06,
-    "mean": 1.3044421971204726e-05,
-    "range": 2.047454169528274e-05,
-    "fraction_positive": 0.9333333333333333,
-    "variance_reduction_orientation_achieved": 0.07677086004633404,
-    "variance_reduction_interface_resistance": 0.9196347936362612,
-    "variance_reduction_filler_conductivity": 0.00012952031052237967
+    "total_sd": 5.284444751924923e-06,
+    "mean": 8.340961715427817e-06,
+    "range": 1.4229588200998612e-05,
+    "fraction_positive": 0.8,
+    "variance_reduction_orientation_achieved": NaN,
+    "variance_reduction_interface_resistance": 0.9999720282588962,
+    "variance_reduction_filler_conductivity": 3.322757568091639e-06
   }
 }

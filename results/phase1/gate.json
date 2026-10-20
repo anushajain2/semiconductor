@@ -4,9 +4,9 @@
     "source_supported_bn_case_defined": false,
     "heldout_median_error_below_5pct": true,
     "finalist_top1_survives_direct_check": false,
-    "loop_top1_within_2se_of_verified_best": true,
-    "bo_better_than_random_at_matched_budget": true,
-    "bo_better_than_sweep": false,
+    "loop_top1_not_resolved_from_verified_best": true,
+    "bo_resolved_better_than_random_this_campaign": true,
+    "bo_resolved_better_than_sweep_this_campaign": false,
     "numerical_error_below_claimed_benefit": true
   },
   "proceed_to_phase2": false,
@@ -16,7 +16,7 @@
     "source_supported_bn_case_defined",
     "heldout_median_error_below_5pct",
     "finalist_top1_survives_direct_check",
-    "bo_better_than_random_at_matched_budget",
+    "bo_resolved_better_than_random_this_campaign",
     "numerical_error_below_claimed_benefit"
   ],
   "blocking": [
@@ -24,21 +24,31 @@
     "finalist_top1_survives_direct_check"
   ],
   "informational_unmet": [
-    "bo_better_than_sweep"
+    "bo_resolved_better_than_sweep_this_campaign"
   ],
-  "verified_best_robust": {
-    "bayesian_optimisation": 0.00018080499669751295,
-    "random_search": 0.0001962449293344509,
-    "sweep": 0.0001831139021210021
+  "method_picks": {
+    "bayesian_optimisation": "nominal_opt",
+    "random_search": "random_search_2",
+    "sweep": "sweep_3"
   },
-  "verified_best_robust_se": {
-    "bayesian_optimisation": 1.1744502652674407e-06,
-    "random_search": 3.1954899188597344e-06,
-    "sweep": 2.6337135313041957e-06
+  "confirmed_pick_robust": {
+    "bayesian_optimisation": 0.00018293872321940827,
+    "random_search": 0.00019138865888243073,
+    "sweep": 0.00017846754158416315
+  },
+  "confirmed_pick_robust_se": {
+    "bayesian_optimisation": 8.456505901134438e-07,
+    "random_search": 9.576477626711218e-07,
+    "sweep": 2.9657293289378666e-06
+  },
+  "method_comparison_p_holm": {
+    "random_search_minus_bayesian_optimisation": 2.570696585610541e-06,
+    "sweep_minus_bayesian_optimisation": 0.17120644876441946
   },
   "solver_calls_to_within_1pct": {
     "bayesian_optimisation": 1020,
     "random_search": null,
     "sweep": 585
-  }
+  },
+  "note": "single campaign per method; 'not resolved' is not equivalence"
 }

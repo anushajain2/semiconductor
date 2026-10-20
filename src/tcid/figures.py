@@ -35,6 +35,7 @@ IDENTITY = {
     "recommended": SLOTS[1],
     "small_particles_aligned": SLOTS[2],
     "large_particles_aligned": SLOTS[3],
+    "medium_particles_aligned": SLOTS[4],
     "bayesian_optimisation": SLOTS[1],
     "random_search": SLOTS[0],
     "sweep": SLOTS[2],
@@ -44,6 +45,7 @@ NICE = {
     "recommended": "Recommended (verified best)",
     "small_particles_aligned": "Aligned, small particles",
     "large_particles_aligned": "Aligned, large particles",
+    "medium_particles_aligned": "Aligned, medium particles",
     "bayesian_optimisation": "Bayesian optimisation",
     "random_search": "Random search",
     "sweep": "3-level sweep",
@@ -174,19 +176,26 @@ def fig_design_map(study, out: Path):
         if j == 0:
             ax.set_ylabel("Achieved / target orientation order")
     handles = [Patch(fc=IDENTITY[l], label=_nice(l)) for l in labels]
-    handles.append(Patch(fc="#999999", hatch="///", ec=SURFACE, label="winner not distinguishable (< 2 SE)"))
+    handles.append(Patch(fc="#999999", hatch="///", ec=SURFACE, label="winner not resolved from runner-up (Welch p ≥ 0.05)"))
     handles.append(Patch(fc="#dddddd", label="faded: outside supported range"))
     fig.legend(handles=handles, loc="upper center", ncol=4, bbox_to_anchor=(0.5, 1.02))
     ax = fig.add_subplot(gs[1, :])
     sub = g[(g["k_filler_par"] == 30.0) & (g["order_fraction"] == 1.0)]
+    ends = []
     for lab in labels:
         s = sub[sub["label"] == lab].sort_values("r_interface")
         if s.empty:
             continue
         ax.errorbar(s["r_interface"], s["r_mean"] * 1e6, yerr=2 * s["se"] * 1e6, color=IDENTITY[lab], marker="o", ms=4,
                     capsize=2, label=_nice(lab))
-        ax.annotate(_nice(lab), (s["r_interface"].iloc[-1], s["r_mean"].iloc[-1] * 1e6), xytext=(6, 0),
-                    textcoords="offset points", color=INK2, fontsize=8, va="center")
+        ends.append([s["r_mean"].iloc[-1] * 1e6, lab, s["r_interface"].iloc[-1]])
+    # direct labels at the line ends, nudged apart so they never overlap
+    ends.sort()
+    gap = 0.045 * (sub["r_mean"].max() - sub["r_mean"].min()) * 1e6
+    for i in range(1, len(ends)):
+        ends[i][0] = max(ends[i][0], ends[i - 1][0] + gap)
+    for y, lab, x in ends:
+        ax.annotate(_nice(lab), (x, y), xytext=(6, 0), textcoords="offset points", color=INK2, fontsize=8, va="center")
     ax.axvspan(1e-8, 1e-6, color=GRID, alpha=0.35, lw=0)
     ax.text(1.1e-8, ax.get_ylim()[1], "supported interface range", va="top", color=INK2, fontsize=8)
     ax.set_xscale("log")
@@ -201,29 +210,30 @@ def fig_design_map(study, out: Path):
 def fig_contacts(study, out: Path):
     q = pd.read_parquet(study.out / "questions" / "q2_benefit.parquet")
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 4.2), gridspec_kw={"width_ratios": [1.25, 1], "wspace": 0.25})
-    th = sorted(q["thickness"].unique())
     nominal = study.nominal.name
-    for k, t in enumerate(th):
-        s = q[q["thickness"] == t]
-        col = SLOTS[[0, 1, 2][k % 3]]
-        nom = s[s["scenario"] == nominal].sort_values("r_contact_total")
-        x = nom["r_contact_total"].replace(0, 3e-7)
-        band = s[s["scenario"] != nominal].groupby("r_contact_total")["benefit_rel_total"].agg(["min", "max"]).reset_index()
-        bx = band["r_contact_total"].replace(0, 3e-7)
-        a1.fill_between(bx, band["min"] * 100, band["max"] * 100, color=col, alpha=0.15, lw=0)
-        a1.plot(x, nom["benefit_rel_total"] * 100, color=col, marker="o", ms=4, label=f"t = {t * 1e6:.0f} µm")
-        a1.annotate(f"t = {t * 1e6:.0f} µm", (x.iloc[-1], nom["benefit_rel_total"].iloc[-1] * 100), xytext=(5, 0),
-                    textcoords="offset points", color=INK2, fontsize=8, va="center")
+    th = sorted(q["thickness"].unique())
+    for (pair, ls), k0 in zip((("recommended", "-"), ("medium_particles_aligned", "--")), (0, 0)):
+        for k, t in enumerate(th):
+            s = q[(q["thickness"] == t) & (q["pair"] == pair)]
+            if s.empty:
+                continue
+            col = SLOTS[k % 3]
+            nom = s[s["scenario"] == nominal].sort_values("r_contact_total")
+            x = nom["r_contact_total"].replace(0, 3e-7)
+            a1.fill_between(x, nom["benefit_ci_low"] * 100, nom["benefit_ci_high"] * 100, color=col, alpha=0.12, lw=0)
+            a1.plot(x, nom["benefit_rel_total"] * 100, color=col, ls=ls, marker="o", ms=3.5,
+                    label=f"{'recommended' if pair == 'recommended' else 'medium pair'}, t = {t * 1e6:.0f} µm")
     a1.axhline(10, color=INK2, lw=1, ls="--")
-    a1.text(4e-7, 10.5, "10% benefit", color=INK2, fontsize=8)
+    a1.text(1.4e-3, 10.3, "10% benefit", color=INK2, fontsize=8, ha="right")
     a1.axvspan(3e-7, 3e-5 * 2, color=GRID, alpha=0.3, lw=0)
     a1.set_xscale("log")
     a1.set_xlim(2.5e-7, 1.5e-3)
     a1.set_xlabel("Total outer contact resistance R_top + R_bottom (m²K/W; leftmost point = 0)")
     a1.set_ylabel("Assembly benefit vs baseline (%)")
-    a1.set_title("Assembly benefit vs outer contacts\n(line: nominal scenario; band: stress scenarios)", loc="left", fontsize=10)
-    a1.legend(loc="lower left")
-    s = q[(q["thickness"] == 100e-6) & (q["scenario"] == nominal)]
+    a1.set_title("Assembly benefit vs outer contacts, nominal scenario\n(band: 95% bootstrap interval over 12 seeds per design)",
+                 loc="left", fontsize=10)
+    a1.legend(loc="upper right", fontsize=7.5)
+    s = q[np.isclose(q["thickness"], study.cfg.layer.thickness) & (q["scenario"] == nominal) & (q["pair"] == "recommended")]
     cs = [0, 1e-5, 3e-5, 1e-4]
     xs = np.arange(len(cs))
     w = 0.36
@@ -297,18 +307,15 @@ def fig_search(study, out: Path):
             ax.step(xv, s["best"] * 1e6, where="post", color=col, label=_nice(meth))
             ax.annotate(_nice(meth), (xv.iloc[-1], s["best"].iloc[-1] * 1e6), xytext=(40, dy), textcoords="offset points",
                         color=INK2, fontsize=8, va="center")
-    ver = {"bayesian_optimisation": ["robust_opt", "shortlist_2", "shortlist_3", "nominal_opt"],
-           "random_search": ["random_search_best"], "sweep": ["sweep_best"]}
-    for meth, keys in ver.items():
-        labs = [fin["label_of"][k] for k in keys if k in fin["label_of"]]
-        if labs:
-            best = min(fin["verified"][l]["robust"] for l in labs)
-            s = c[c["method"] == meth]
-            a1.scatter([s["calls"].iloc[-1]], [best * 1e6], marker="D", s=40, color=IDENTITY[meth], edgecolor=SURFACE, zorder=5)
+    for meth, lab in fin["method_picks"].items():
+        v = fin["confirmed"][lab]
+        s = c[c["method"] == meth]
+        a1.errorbar([s["calls"].iloc[-1]], [v["robust"] * 1e6], yerr=[2 * v["robust_se"] * 1e6], fmt="D", ms=6,
+                    color=IDENTITY[meth], mec=SURFACE, ecolor=IDENTITY[meth], capsize=2, zorder=5)
     a1.set_xlabel("Solver calls (one call = one geometry × scenario solve)")
     a1.set_ylabel("Best robust objective (mm²K/W)")
-    a1.set_title("Best design found vs simulator calls\n(◆ = best shortlisted design re-verified on fresh seeds, refined mesh)",
-                 loc="left", fontsize=10)
+    a1.set_title("Best design found vs simulator calls (one campaign per method)\n"
+                 "◆ = method's best-of-4, confirmed on 12 independent seeds (±2 SE)", loc="left", fontsize=10)
     a2.set_xlabel("CPU hours (geometry + meshing + solves + surrogate training/acquisition)")
     a2.set_title("…and vs elapsed CPU time\n", loc="left", fontsize=10)
     for ax in (a1, a2):
@@ -392,11 +399,41 @@ def fig_mesh_detail(study, out: Path):
     plt.close(fig)
 
 
+def fig_crossings(study, out: Path):
+    cur = pd.read_parquet(study.out / "questions" / "q1_crossing_curves.parquet")
+    cr = json.loads((study.out / "questions" / "q1_crossings.json").read_text())
+    pairs = [k for k, p in cr["pairs"].items() if "estimate" in p]
+    fig, axes = plt.subplots(1, len(pairs), figsize=(13, 3.9), sharey=False)
+    for ax, (pair, col) in zip(axes, zip(pairs, SLOTS)):
+        a, b = pair.split("|")
+        s = cur[cur["pair"] == pair].sort_values("r_interface")
+        ax.fill_between(s["r_interface"], s["ci_low"] * 1e6, s["ci_high"] * 1e6, color=col, alpha=0.18, lw=0)
+        ax.plot(s["r_interface"], s["diff"] * 1e6, color=col, marker="o", ms=3)
+        ax.axhline(0, color=INK2, lw=1)
+        ax.axvspan(s["r_interface"].min(), 1e-6, color=GRID, alpha=0.35, lw=0)
+        p = cr["pairs"][pair]
+        if np.isfinite(p["ci_low"]):
+            ax.axvspan(p["ci_low"], p["ci_high"], color=INK2, alpha=0.12, lw=0)
+            ax.axvline(p["estimate"], color=INK2, lw=1, ls="--")
+        ax.set_xscale("log")
+        ax.set_xlabel("Interface resistance (m²K/W)")
+        ax.set_title(f"{_nice(a)} − {_nice(b)}\ncrossing ≈ {p['estimate']:.1e} [{p['ci_low']:.1e}, {p['ci_high']:.1e}]",
+                     loc="left", fontsize=9)
+        ax.text(0.02, 0.96, p["status"], transform=ax.transAxes, va="top", fontsize=7.5, color=INK2)
+    axes[0].set_ylabel("Difference in layer resistance (mm²K/W)")
+    fig.suptitle("Particle-size crossings: mean difference ±95% bootstrap band (12 seeds per design); grey column = "
+                 "supported range; dark band = 95% interval of the crossing", x=0.01, ha="left", fontsize=10, color=INK)
+    fig.tight_layout()
+    fig.savefig(out / "fig9_crossings.png")
+    plt.close(fig)
+
+
 def make_all(study):
     _style()
     out = Path("docs/figures")
     out.mkdir(parents=True, exist_ok=True)
-    for fn in (fig_fields, fig_design_map, fig_contacts, fig_realizations, fig_search, fig_surrogate, fig_q3, fig_mesh_detail):
+    for fn in (fig_fields, fig_design_map, fig_contacts, fig_realizations, fig_search, fig_surrogate, fig_q3, fig_mesh_detail,
+               fig_crossings):
         try:
             fn(study, out)
             print(f"  figure {fn.__name__}: ok")

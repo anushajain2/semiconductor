@@ -1,11 +1,59 @@
 {
   "supported": true,
-  "text": "Verified candidate distributions (fresh geometry seeds, refined mesh):\n\ncandidate                                 d50 um  sigma    AR     S       R_robust    R_nom  vs baseline\nnominal_opt *                               6.72   0.42  4.00  0.87    180.8mm2K/W    167.5      +22.4%\nrobust_opt ~                               21.09   0.05  4.00  0.84    186.9mm2K/W    179.4      +19.7%\nshortlist_2 ~                               9.61   0.40  4.00  0.95    183.6mm2K/W    172.7      +21.2%\nshortlist_3                                16.65   0.17  4.00  0.95    185.5mm2K/W    177.1      +20.3%\nbaseline (random orientation)               6.72   0.42  4.00  0.00    232.8mm2K/W    215.7       +0.0%\n\n* recommended;  ~ statistically indistinguishable from the recommended design (< 2 SE): choose on other grounds.\nSensitivity: worst-case values above are the maximum over the stress scenarios good_iface_low_kf, good_iface_high_kf, poor_iface_low_kf, poor_iface_high_kf (stress cases, not probabilities).\nDesign map (Q1): within the supported interface range the leading candidate is small_particles_aligned; 100% of map cells cannot distinguish the top two.\nConfiguration files written to results/recommendation/ (solve one with `tcid solve <file>`).\n\nModelled domain: 2D cross-section of a cured particle-filled epoxy layer between isothermal faces with insulated sidewalls; steady linear conduction; isotropic alumina-like development filler (NOT boron nitride); area fraction (not a 3D volume fraction); particle-matrix interface resistance and filler conductivity treated as stress scenarios, not probabilities; outer contacts added in series. Not modelled: 3D connectivity, BN anisotropy, viscosity/processing, adhesion, cure, dielectric breakdown, stress, ageing. Not a qualified adhesive.",
+  "text": "Candidate distributions. Robust R = mean resistance in the worst stress scenario (mm2K/W).\nVerification: 6 seeds (used for selection); confirmation: 12 independent seeds (quote these).\n\ncandidate                           d50 um  sigma    AR     S   verif.       confirmed vs ref. base\nsweep_3 *                            24.00   0.05  4.00  0.95    175.4    178.5 \u00b1  3.0      +20.2%\nsweep_4 ~                             9.80   0.05  4.00  0.95    179.8    181.2 \u00b1  0.9      +18.9%\nnominal_opt ~                         6.72   0.42  4.00  0.87    180.8    182.9 \u00b1  0.8      +18.2%\nsweep_2 ~                             9.80   0.50  4.00  0.95    181.7    179.9 \u00b1  1.4      +19.5%\nsweep_best ~                          9.80   0.28  4.00  0.95    183.1    179.3 \u00b1  0.9      +19.8%\nshortlist_2 ~                         9.61   0.40  4.00  0.95    183.6    180.8 \u00b1  2.1      +19.1%\nshortlist_3 ~                        16.65   0.17  4.00  0.95    185.5    179.2 \u00b1  1.5      +19.9%\nrobust_opt ~                         21.09   0.05  4.00  0.84    186.9    185.0 \u00b1  2.2      +17.3%\nrandom_search_2                      11.20   0.07  3.40  0.91    193.9    191.4 \u00b1  1.0      +14.4%\nbaseline (random orientation)        24.00   0.05  4.00  0.00    237.2    223.6 \u00b1  3.3       +0.0%\n\nvs ref. base = confirmed robust R relative to the recommended design's own random-orientation baseline.\n* recommended;  ~ difference from the recommended design not resolved (Holm-corrected Welch test on the\n  verification batch). Not resolved is not the same as equivalent; with no resolved difference, choose on\n  other grounds (cost, viscosity, supply).\nSensitivity: worst-case values above are the maximum over the stress scenarios good_iface_low_kf, good_iface_high_kf, poor_iface_low_kf, poor_iface_high_kf (stress cases, not probabilities).\nDesign map (Q1, 3 seeds per cell): within the supported interface range the most frequent leader is medium_particles_aligned; 93% of map cells cannot distinguish the top two.\nConfiguration files written to results/recommendation/ (solve one with `tcid solve <file>`).\n\nModelled domain: 2D cross-section of a cured particle-filled epoxy layer between isothermal faces with insulated sidewalls; steady linear conduction; isotropic alumina-like development filler (NOT boron nitride); area fraction (not a 3D volume fraction); particle-matrix interface resistance and filler conductivity treated as stress scenarios, not probabilities; outer contacts added in series. Not modelled: 3D connectivity, BN anisotropy, viscosity/processing, adhesion, cure, dielectric breakdown, stress, ageing. Not a qualified adhesive.",
   "candidates": [
     {
-      "label": "nominal_opt",
+      "label": "sweep_3",
       "role": "recommended",
-      "distinguishable_from_recommended": false,
+      "resolved": null,
+      "design_id": "4a51acc3a698",
+      "robust": 0.00017535295182232903,
+      "robust_se": 3.1626947913597265e-06,
+      "nominal": 0.00016790028078074071,
+      "nominal_se": 3.2066025324765338e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.4000000000000004e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00017846754158416315,
+        "robust_se": 2.9657293289378666e-06,
+        "nominal": 0.00017106073618386195,
+        "n": 12
+      }
+    },
+    {
+      "label": "sweep_4",
+      "role": "alternative",
+      "resolved": false,
+      "design_id": "e0fc1a0a8504",
+      "robust": 0.00017977253885869253,
+      "robust_se": 1.8379048874312326e-06,
+      "nominal": 0.00016754492668306732,
+      "nominal_se": 1.951453475202151e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.797958971132717e-06,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00018123640630046214,
+        "robust_se": 9.33862965243234e-07,
+        "nominal": 0.00016899073974287624,
+        "n": 12
+      }
+    },
+    {
+      "label": "nominal_opt",
+      "role": "alternative",
+      "resolved": false,
       "design_id": "10286d789fb9",
       "robust": 0.00018080499669751295,
       "robust_se": 1.1744502652674407e-06,
@@ -18,30 +66,66 @@
         "aspect": 4.0,
         "order": 0.8749549213108004,
         "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00018293872321940827,
+        "robust_se": 8.456505901134438e-07,
+        "nominal": 0.00016940328962334046,
+        "n": 12
       }
     },
     {
-      "label": "robust_opt",
+      "label": "sweep_2",
       "role": "alternative",
-      "distinguishable_from_recommended": false,
-      "design_id": "6d39bd4a6165",
-      "robust": 0.00018692347758618062,
-      "robust_se": 3.288739813204773e-06,
-      "nominal": 0.0001794016325638726,
-      "nominal_se": 3.3884027008514825e-06,
+      "resolved": false,
+      "design_id": "ce1744097602",
+      "robust": 0.0001817401978064677,
+      "robust_se": 1.4204592250115395e-06,
+      "nominal": 0.00017234822186317728,
+      "nominal_se": 1.5439430837781053e-06,
       "design": {
         "loading": 0.3,
-        "d50": 2.108874794890566e-05,
-        "sigma_ln": 0.05,
+        "d50": 9.797958971132717e-06,
+        "sigma_ln": 0.5,
         "aspect": 4.0,
-        "order": 0.8410684855286229,
+        "order": 0.95,
         "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.0001799407745365047,
+        "robust_se": 1.403545160349099e-06,
+        "nominal": 0.0001702850903020068,
+        "n": 12
+      }
+    },
+    {
+      "label": "sweep_best",
+      "role": "alternative",
+      "resolved": false,
+      "design_id": "0d99d341ddf6",
+      "robust": 0.0001831139021210021,
+      "robust_se": 2.6337135313041957e-06,
+      "nominal": 0.00017209547297014814,
+      "nominal_se": 2.8394995431286035e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.797958971132717e-06,
+        "sigma_ln": 0.275,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.0001792852129792275,
+        "robust_se": 9.497833086901688e-07,
+        "nominal": 0.0001681138948820514,
+        "n": 12
       }
     },
     {
       "label": "shortlist_2",
       "role": "alternative",
-      "distinguishable_from_recommended": false,
+      "resolved": false,
       "design_id": "0882810a0295",
       "robust": 0.00018357151887467805,
       "robust_se": 9.783162178072557e-07,
@@ -54,12 +138,18 @@
         "aspect": 4.0,
         "order": 0.95,
         "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00018081292158223308,
+        "robust_se": 2.0514008006404453e-06,
+        "nominal": 0.00017056466019364696,
+        "n": 12
       }
     },
     {
       "label": "shortlist_3",
       "role": "alternative",
-      "distinguishable_from_recommended": true,
+      "resolved": false,
       "design_id": "67d1f17409a2",
       "robust": 0.00018548832215122254,
       "robust_se": 1.8371218313140013e-06,
@@ -72,22 +162,82 @@
         "aspect": 4.0,
         "order": 0.95,
         "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00017920857975286313,
+        "robust_se": 1.5061095932719931e-06,
+        "nominal": 0.00017064301304559233,
+        "n": 12
+      }
+    },
+    {
+      "label": "robust_opt",
+      "role": "alternative",
+      "resolved": false,
+      "design_id": "6d39bd4a6165",
+      "robust": 0.00018692347758618062,
+      "robust_se": 3.288739813204773e-06,
+      "nominal": 0.0001794016325638726,
+      "nominal_se": 3.3884027008514825e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.108874794890566e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.8410684855286229,
+        "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00018496942708376448,
+        "robust_se": 2.2462567836779275e-06,
+        "nominal": 0.00017712547096751852,
+        "n": 12
+      }
+    },
+    {
+      "label": "random_search_2",
+      "role": "alternative",
+      "resolved": true,
+      "design_id": "ff9082f955bf",
+      "robust": 0.00019391176940499027,
+      "robust_se": 1.540876990655732e-06,
+      "nominal": 0.0001821513924168223,
+      "nominal_se": 1.5652923061663464e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.1195048590155352e-05,
+        "sigma_ln": 0.06785888830655001,
+        "aspect": 3.4049932152756197,
+        "order": 0.9120673711748672,
+        "preferred_angle": 1.5707963267948966
+      },
+      "confirmed": {
+        "robust": 0.00019138865888243073,
+        "robust_se": 9.576477626711218e-07,
+        "nominal": 0.0001795956107692047,
+        "n": 12
       }
     }
   ],
   "baseline": {
-    "design_id": "cc3ace59143c",
-    "robust": 0.0002328473879519894,
-    "robust_se": 2.9891371064895677e-06,
-    "nominal": 0.00021574421363423492,
-    "nominal_se": 2.857883089480684e-06,
+    "design_id": "b2b8ad263a90",
+    "robust": 0.00023722866225892795,
+    "robust_se": 4.628174404961016e-06,
+    "nominal": 0.00022786750947426888,
+    "nominal_se": 4.511876090156397e-06,
     "design": {
       "loading": 0.3,
-      "d50": 6.717031019410964e-06,
-      "sigma_ln": 0.4176086102211366,
+      "d50": 2.4000000000000004e-05,
+      "sigma_ln": 0.05,
       "aspect": 4.0,
       "order": 0.0,
       "preferred_angle": 1.5707963267948966
+    },
+    "confirmed": {
+      "robust": 0.00022359457825635895,
+      "robust_se": 3.3441449565916787e-06,
+      "nominal": 0.00021454556709158505,
+      "n": 12
     }
   }
 }

@@ -29,6 +29,7 @@ from .materials import Scenario, load_material, load_scenarios
 from .provenance import config_hash, write_manifest
 from .search import bayes_opt, best_so_far, design_objectives, job_cost
 from .simulate import make_jobs, run_jobs
+from .stats import bootstrap, first_crossing, holm, welch
 from .surrogate import GPSurrogate, TreeSurrogate, aggregate, cross_validate, features
 
 TARGET_HELDOUT_ERROR = 0.05  # guide section 6 working target
@@ -292,12 +293,19 @@ class Study:
             aspect=float(row["aspect"]), order=float(row["order"]), preferred_angle=self.space.preferred_angle,
         )
 
-    OPTIMISED = ("robust_opt", "shortlist_2", "shortlist_3", "nominal_opt", "random_search_best", "sweep_best")
+    # every search method gets the same number of candidates re-verified (no best-of-N advantage)
+    METHODS = {
+        "bayesian_optimisation": ("robust_opt", "shortlist_2", "shortlist_3", "nominal_opt"),
+        "random_search": ("random_search_best", "random_search_2", "random_search_3", "random_search_4"),
+        "sweep": ("sweep_best", "sweep_2", "sweep_3", "sweep_4"),
+    }
+    OPTIMISED = tuple(l for labs in METHODS.values() for l in labs)
 
     def candidates(self) -> dict[str, Design]:
-        """Shortlist from the loop, the best of each comparison method, and matched baselines.
+        """Top four designs of each search method (by loop robust value) and matched baselines.
 
-        Every optimised candidate gets its own random-orientation baseline at matched loading,
+        The BO four are its three best robust designs plus its best nominal design. Every
+        optimised candidate gets its own random-orientation baseline at matched loading,
         sizes and shape (label suffix ``__S0``).
         """
         loop = self.load("search", "loop_rows.parquet")
@@ -310,9 +318,10 @@ class Study:
             cands["robust_opt" if i == 0 else f"shortlist_{i + 1}"] = self._design_from_obj(r)
         nom = obj.nsmallest(1, "nominal").iloc[0]
         cands["nominal_opt"] = self._design_from_obj(nom)
-        for label, f in (("random_search_best", "random_rows.parquet"), ("sweep_best", "sweep_rows.parquet")):
+        for method, f in (("random_search", "random_rows.parquet"), ("sweep", "sweep_rows.parquet")):
             o = design_objectives(self.load("search", f), n_stress=ns)
-            cands[label] = self._design_from_obj(o.nsmallest(1, "robust").iloc[0])
+            for lab, (_, r) in zip(self.METHODS[method], o.nsmallest(4, "robust").iterrows()):
+                cands[lab] = self._design_from_obj(r)
         for lab in list(cands):
             cands[f"{lab}__S0"] = cands[lab].with_(order=0.0)
         cands["conventional_circles"] = Design(
@@ -378,31 +387,67 @@ class Study:
                              "design": uniq[did].to_dict()}
 
         opt_labels = [l for l in self.OPTIMISED if l in cands]
+        # selection happens on this verification batch; the confirmation batch below reports
+        # values that were not used to choose anything (removes best-of-N selection bias)
         rec = min(opt_labels, key=lambda l: verified[label_of[l]]["robust"])
         rec_d = cands[rec]
-        rec_v = verified[label_of[rec]]
-        # which optimised candidates are statistically indistinguishable from the recommended one?
-        separable = {}
-        for l in opt_labels:
-            v = verified[label_of[l]]
-            gap = v["robust"] - rec_v["robust"]
-            se = math.sqrt(v["robust_se"] ** 2 + rec_v["robust_se"] ** 2)
-            separable[l] = {"gap": gap, "se": se, "distinguishable": bool(gap > 2 * se)}
+        picks = {m: min((l for l in labs if l in cands), key=lambda l: verified[label_of[l]]["robust"])
+                 for m, labs in self.METHODS.items()}
+
+        def worst_values(rr, d):
+            """Per-realization resistance in the design's worst stress scenario (by mean)."""
+            sel = rr[(rr["design_id"] == config_hash(d.to_dict(), 12)) & rr["scenario"].isin(stress_names)]
+            worst = sel.groupby("scenario")["r_layer"].mean().idxmax()
+            return sel[sel["scenario"] == worst].sort_values("seed")["r_layer"].to_numpy()
+
+        # which optimised candidates did we fail to separate from the recommended one?
+        # Welch tests on per-realization worst-scenario values, Holm-corrected over the family.
+        rec_vals = worst_values(rows, rec_d)
+        tests = {l: welch(worst_values(rows, cands[l]), rec_vals) for l in opt_labels
+                 if label_of[l] != label_of[rec]}
+        p_adj = holm({l: t["p"] for l, t in tests.items()})
+        separable = {l: {**t, "p_holm": p_adj[l], "resolved": bool(p_adj[l] < 0.05 and t["diff"] > 0)}
+                     for l, t in tests.items()}
+
+        # confirmation batch: new seeds for the recommended design, every candidate not resolved
+        # from it, each method's pick, and the recommended design's matched baseline
+        conf_labels = list(dict.fromkeys([rec] + [l for l, v in separable.items() if not v["resolved"]]
+                                         + list(picks.values()) + [f"{rec}__S0"]))
+        conf_seeds = b["confirm_seeds"]
+        conf_designs = {label_of[l]: cands[l] for l in conf_labels}
+        conf = self.run(list(conf_designs.values()), conf_seeds, "confirm", mesh=ms_ref)
+        conf_summ = self._summaries(conf, labels)
+        confirmed = {}
+        for lab, d in conf_designs.items():
+            vals = worst_values(conf, d)
+            nom = conf[(conf["design_id"] == config_hash(d.to_dict(), 12)) & (conf["scenario"] == self.nominal.name)]
+            confirmed[lab] = {"robust": float(vals.mean()), "robust_se": float(vals.std(ddof=1) / math.sqrt(vals.size)),
+                              "nominal": float(nom["r_layer"].mean()), "n": int(vals.size)}
+        rec_conf = worst_values(conf, rec_d)
+        conf_tests = {lab: welch(worst_values(conf, d), rec_conf) for lab, d in conf_designs.items()
+                      if lab != label_of[rec] and not lab.endswith("__S0")}
+        method_vals = {m: worst_values(conf, cands[l]) for m, l in picks.items()}
+        method_cmp = {}
+        for other in ("random_search", "sweep"):
+            t = welch(method_vals[other], method_vals["bayesian_optimisation"])
+            base = method_vals[other].mean()
+            method_cmp[f"{other}_minus_bayesian_optimisation"] = {
+                **t, "rel": t["diff"] / base, "rel_ci_low": t["ci_low"] / base, "rel_ci_high": t["ci_high"] / base}
+        rec_vs_base = welch(worst_values(conf, cands[f"{rec}__S0"]), rec_conf)
 
         # paired candidate - matched-baseline differences under the same scenarios
         diffs = []
         for l in opt_labels:
             did, bid = config_hash(cands[l].to_dict(), 12), config_hash(cands[f"{l}__S0"].to_dict(), 12)
             for sc in summ["scenario"].unique():
-                c_ = summ[(summ["design_id"] == did) & (summ["scenario"] == sc)]
-                bb = summ[(summ["design_id"] == bid) & (summ["scenario"] == sc)]
-                if not len(c_) or not len(bb):
+                cv = rows[(rows["design_id"] == did) & (rows["scenario"] == sc)]["r_layer"].to_numpy()
+                bv = rows[(rows["design_id"] == bid) & (rows["scenario"] == sc)]["r_layer"].to_numpy()
+                if not cv.size or not bv.size:
                     continue
-                c_, bb = c_.iloc[0], bb.iloc[0]
-                dd = bb["r_mean"] - c_["r_mean"]
-                se = math.sqrt(c_["r_se"] ** 2 + bb["r_se"] ** 2)
-                diffs.append({"label": l, "scenario": sc, "baseline_minus_candidate": dd, "se": se,
-                              "relative_benefit": dd / bb["r_mean"], "t_ratio": dd / se if se > 0 else float("inf")})
+                t = welch(bv, cv)
+                diffs.append({"label": l, "scenario": sc, "baseline_minus_candidate": t["diff"], "se": t["se"],
+                              "ci_low": t["ci_low"], "ci_high": t["ci_high"], "p": t["p"],
+                              "relative_benefit": t["diff"] / bv.mean(), "t_ratio": t["diff"] / t["se"] if t["se"] else float("inf")})
         diffs = pd.DataFrame(diffs)
         self.save(diffs, "final", "paired_differences.parquet")
 
@@ -413,9 +458,10 @@ class Study:
         ms_fine = replace(self.cfg.mesh, size_factor=float(b["final_refinements"][1]))
         fine = self.run(key, fresh[:2], "final-refine", mesh=ms_fine)
         coarse = self.run(key, fresh[:2], "final-coarse", mesh=self.cfg.mesh)
-        allrows = pd.concat([rows, fine, coarse, fld], ignore_index=True)
+        allrows = pd.concat([rows, fine, coarse, fld, conf], ignore_index=True)
         self.save(allrows, "final", "final_rows.parquet")
         self.save(summ, "final", "final_summary.parquet")
+        self.save(conf_summ, "final", "confirmation_summary.parquet")
         ref = []
         for did, role in roles.items():
             for sc in [s.name for s in self.scenarios]:
@@ -468,12 +514,20 @@ class Study:
             "loop_top1": "robust_opt",
             "loop_top1_value_on_training_seeds": float(obj["robust"].min()),
             "loop_top1_value_on_fresh_seeds": loop_top["robust"],
+            "selection_batch_seeds": fresh,
+            "confirmation_seeds": conf_seeds,
             "separability_from_recommended": separable,
+            "method_picks": {m: label_of[l] for m, l in picks.items()},
+            "confirmed": confirmed,
+            "confirmed_vs_recommended": conf_tests,
+            "confirmed_recommended_vs_baseline": {**rec_vs_base, "rel": rec_vs_base["diff"] / worst_values(conf, cands[f"{rec}__S0"]).mean()},
+            "method_comparison_confirmed": method_cmp,
             "surrogate_predicted_robust": pred,
             "order_predicted": order_pred,
             "order_verified": order_ver,
             "top1_survives": label_of[rec] == label_of["robust_opt"],
-            "top1_within_2se_of_verified_best": not separable["robust_opt"]["distinguishable"],
+            "top1_not_resolved_from_verified_best": (label_of["robust_opt"] == label_of[rec])
+            or not separable["robust_opt"]["resolved"],
             "spearman_pred_vs_verified": float(rho),
             "spearman_nominal_vs_robust_loop": float(rho_nr),
             "mesh_refinement_max_change": mesh_err,
@@ -506,11 +560,11 @@ class Study:
         c = self._final_designs()
         ro = c["recommended"]
         lo, hi = self.space.bounds["d50"]
+        # size ladder sharing the recommended width, shape and alignment, plus the recommended design itself
         cands = {
             "baseline_random_orientation": c["baseline_random_orientation"],
             "recommended": ro,
-            "small_particles_aligned": ro.with_(d50=lo),
-            "large_particles_aligned": ro.with_(d50=hi * 0.85),
+            **self._size_ladder(ro),
         }
         r_values = [1e-9, 3e-9, 1e-8, 3e-8, 1e-7, 3e-7, 1e-6, 3e-6, 1e-5]
         scen = self._scenario_grid(r_values, [20.0, 30.0, 35.0])
@@ -535,16 +589,22 @@ class Study:
             r_mean=("r_layer", "mean"), r_std=("r_layer", "std"), n=("seed", "nunique")).reset_index()
         g["se"] = g["r_std"] / np.sqrt(g["n"])
         base = g[g["label"] == "baseline_random_orientation"].set_index(["r_interface", "k_filler_par"])
+
+        def vals(label, f, r, kf):
+            f = 1.0 if label == "baseline_random_orientation" else f
+            sel = ok[(ok["label"] == label) & (ok["order_fraction"] == f) & (ok["r_interface"] == r) & (ok["k_filler_par"] == kf)]
+            return sel["r_layer"].to_numpy()
+
         recs = []
         for (f, r, kf), sub in g[g["label"] != "baseline_random_orientation"].groupby(["order_fraction", "r_interface", "k_filler_par"]):
             bb = base.loc[(r, kf)]
             pool = pd.concat([sub, bb.to_frame().T.assign(order_fraction=f, r_interface=r, k_filler_par=kf)])
             pool = pool.sort_values("r_mean")
             w, ru = pool.iloc[0], pool.iloc[1]
-            gap = ru["r_mean"] - w["r_mean"]
-            se = math.sqrt(float(w["se"]) ** 2 + float(ru["se"]) ** 2)
+            t = welch(vals(ru["label"], f, r, kf), vals(w["label"], f, r, kf))
             recs.append({"order_fraction": f, "r_interface": r, "k_filler": kf, "winner": w["label"], "runner_up": ru["label"],
-                         "margin": gap, "margin_rel": gap / w["r_mean"], "distinguishable": bool(gap > 2 * se),
+                         "margin": t["diff"], "margin_rel": t["diff"] / w["r_mean"], "p_welch": t["p"],
+                         "distinguishable": bool(t["p"] < 0.05),
                          "baseline_rank": int(list(pool["label"]).index("baseline_random_orientation")) + 1})
         m = pd.DataFrame(recs)
         self.save(g, "questions", "q1_summary.parquet")
@@ -555,7 +615,11 @@ class Study:
             "winners_all": m["winner"].value_counts().to_dict(),
             "baseline_ever_wins_supported": bool((supported["winner"] == "baseline_random_orientation").any()),
             "indistinguishable_fraction_supported": float(1 - supported["distinguishable"].mean()),
-            "reversals": self._reversals(g),
+            "seeds_per_cell": int(g["n"].min()),
+            "cell_test": "Welch two-sample test of winner vs runner-up, p < 0.05 (screening only, not Holm-corrected)",
+            "coarse_grid_crossings": self._reversals(g),
+            "note": "coarse-grid crossings are crossings of sample means at 3 seeds; see q1_crossings.json for "
+                    "dense-grid, 12-seed bootstrap intervals",
         }
         _json(self.path("questions", "q1.json"), res)
         return res
@@ -582,87 +646,234 @@ class Study:
                                     "better_below": labs[j] if y0 > 0 else labs[i]})
         return out
 
-    def q4(self) -> dict:
-        rows = self.load("questions", "q1q4_rows.parquet")
-        ok = rows[(rows["status"] == "ok") & (rows["r_interface"] >= 1e-8) & (rows["r_interface"] <= 1e-6)]
-        g = ok.groupby(["label", "order_fraction", "r_interface", "k_filler_par"])["r_layer"].mean().reset_index()
-        base = g[g["label"] == "baseline_random_orientation"].set_index(["r_interface", "k_filler_par"])["r_layer"]
-        res = {}
-        for lab in ("recommended", "small_particles_aligned", "large_particles_aligned"):
-            c = g[g["label"] == lab].copy()
-            if c.empty:
+    def _size_ladder(self, ro: Design) -> dict[str, Design]:
+        """Small / medium / large particles sharing the recommended width, shape and alignment.
+
+        The small rung is the smallest size (from the lower bound, in 0.5 um steps) that packs at
+        the study loading for three test seeds; infeasible smaller sizes are recorded, not hidden.
+        """
+        from .geometry import generate
+
+        lo, hi = self.space.bounds["d50"]
+        small, rejected = lo, []
+        while small < hi:
+            if all(generate(ro.with_(d50=small), self.cfg.layer, self.cfg.geometry, sd).ok for sd in (2000, 2001, 2002)):
+                break
+            rejected.append(small)
+            small += 0.5e-6
+        self._ladder_rejected = rejected
+        return {"small_particles_aligned": ro.with_(d50=small),
+                "medium_particles_aligned": ro.with_(d50=math.sqrt(small * hi)),
+                "large_particles_aligned": ro.with_(d50=hi * 0.85)}
+
+    def q1_crossings(self) -> dict:
+        """Targeted runs around the particle-size crossings with bootstrap intervals on their location.
+
+        Dense interface-resistance grid (8 points per decade) at k_filler = 30 W/mK and full
+        orientation; 12 seeds per design. Each bootstrap resample redraws seeds independently per
+        design and locates the first sign change of the mean-difference curve.
+        """
+        c = self._final_designs()
+        designs = self._size_ladder(c["recommended"])
+        r_grid = list(np.logspace(-7, -5, 17))
+        scen = self._scenario_grid(r_grid, [30.0])
+        seeds = self.budget["crossing_seeds"]
+        rows = self.run(list(designs.values()), seeds, "q1-crossings", scenarios=scen)
+        lab = {config_hash(d.to_dict(), 12): k for k, d in designs.items()}
+        rows["label"] = rows["design_id"].map(lab)
+        self.save(rows, "questions", "q1_crossing_rows.parquet")
+        ok = rows[rows["status"] == "ok"]
+        curves = {}
+        for k in designs:
+            p = ok[ok["label"] == k].pivot_table(index="seed", columns="r_interface", values="r_layer")
+            curves[k] = p.dropna()
+        x = np.array(sorted(curves["small_particles_aligned"].columns))
+        out = {"seeds": seeds, "r_grid": [float(v) for v in x],
+               "d50_um": {k: d.d50 * 1e6 for k, d in designs.items()},
+               "infeasible_small_sizes_um": [v * 1e6 for v in getattr(self, "_ladder_rejected", [])], "pairs": {}}
+        rec_rows = []
+        for a, b in (("small_particles_aligned", "medium_particles_aligned"), ("medium_particles_aligned", "large_particles_aligned"),
+                     ("small_particles_aligned", "large_particles_aligned")):
+            if len(curves[a]) < 3 or len(curves[b]) < 3:
+                out["pairs"][f"{a}|{b}"] = {"status": "not enough feasible realizations"}
                 continue
-            c["delta"] = c.apply(lambda r: base.loc[(r["r_interface"], r["k_filler_par"])] - r["r_layer"], axis=1)
-            res[lab] = _variance_reduction(c, "delta", {"orientation_achieved": "order_fraction",
-                                                        "interface_resistance": "r_interface", "filler_conductivity": "k_filler_par"})
-        # disagreement between the two leading candidates (small vs large particles)
-        a = g[g["label"] == "small_particles_aligned"].set_index(["order_fraction", "r_interface", "k_filler_par"])["r_layer"]
-        bq = g[g["label"] == "large_particles_aligned"].set_index(["order_fraction", "r_interface", "k_filler_par"])["r_layer"]
-        dd = (bq - a).dropna().reset_index(name="delta")
-        res["large_minus_small"] = _variance_reduction(dd, "delta", {"orientation_achieved": "order_fraction",
-                                                                     "interface_resistance": "r_interface", "filler_conductivity": "k_filler_par"})
+            A, B = curves[a][x].to_numpy(), curves[b][x].to_numpy()
+            bs = bootstrap({"A": A, "B": B}, lambda A, B: first_crossing(x, A - B), n=4000, seed=3)
+            dmean = A.mean(0) - B.mean(0)
+            supported_hi = 1e-6
+            if not np.isfinite(bs["estimate"]):
+                status = "no crossing on the grid"
+            elif bs["ci_high"] <= supported_hi:
+                status = "inside supported range"
+            elif bs["ci_low"] > supported_hi:
+                status = "above supported range (boundary stress case)"
+            else:
+                status = "interval straddles the supported-range limit (1e-6)"
+            out["pairs"][f"{a}|{b}"] = {**bs, "better_below": a if dmean[0] < 0 else b, "status": status,
+                                        "per_seed_mean_difference_at_grid": [float(v) for v in dmean]}
+            for i, xv in enumerate(x):
+                dd = bootstrap({"A": A[:, i], "B": B[:, i]}, lambda A, B: A - B, n=1000, seed=4)
+                rec_rows.append({"pair": f"{a}|{b}", "r_interface": xv, "diff": dd["estimate"], "ci_low": dd["ci_low"],
+                                 "ci_high": dd["ci_high"]})
+        self.save(pd.DataFrame(rec_rows), "questions", "q1_crossing_curves.parquet")
+        _json(self.path("questions", "q1_crossings.json"), out)
+        return out
+
+    def q4(self) -> dict:
+        """Sensitivity shares: how much of the spread of a decision quantity disappears when one
+        input is known exactly, averaged over a uniform grid of the *chosen* input ranges.
+
+        This is a sensitivity index conditional on the ranges, grid weighting and independence
+        assumptions; it is not a value-of-information analysis (no measurement cost, accuracy
+        or decision change is modelled). Range variants show how the shares move.
+        """
+        rows = self.load("questions", "q1q4_rows.parquet")
+        ok = rows[rows["status"] == "ok"]
+        g_all = ok.groupby(["label", "order_fraction", "r_interface", "k_filler_par"])["r_layer"].mean().reset_index()
+        inputs = {"orientation_achieved": "order_fraction", "interface_resistance": "r_interface",
+                  "filler_conductivity": "k_filler_par"}
+
+        def shares(r_lo, r_hi, fracs):
+            g = g_all[(g_all["r_interface"] >= r_lo) & (g_all["r_interface"] <= r_hi)]
+            base = g[g["label"] == "baseline_random_orientation"].set_index(["r_interface", "k_filler_par"])["r_layer"]
+            out = {}
+            for lab in ("recommended", "small_particles_aligned", "medium_particles_aligned", "large_particles_aligned"):
+                c = g[(g["label"] == lab) & g["order_fraction"].isin(fracs)].copy()
+                if c.empty:
+                    continue
+                c["delta"] = c.apply(lambda r: base.loc[(r["r_interface"], r["k_filler_par"])] - r["r_layer"], axis=1)
+                out[lab] = _variance_reduction(c, "delta", inputs)
+            a = g[(g["label"] == "small_particles_aligned") & g["order_fraction"].isin(fracs)].set_index(
+                ["order_fraction", "r_interface", "k_filler_par"])["r_layer"]
+            bq = g[(g["label"] == "large_particles_aligned") & g["order_fraction"].isin(fracs)].set_index(
+                ["order_fraction", "r_interface", "k_filler_par"])["r_layer"]
+            dd = (bq - a).dropna().reset_index(name="delta")
+            out["large_minus_small"] = _variance_reduction(dd, "delta", inputs)
+            return out
+
+        variants = {
+            "reference: R 1e-8..1e-6, achieved/target order 0.5-1.0": (1e-8, 1e-6, [0.5, 0.75, 1.0]),
+            "narrower orientation uncertainty (0.75-1.0)": (1e-8, 1e-6, [0.75, 1.0]),
+            "wider interface range (1e-8..1e-5, includes stress cases)": (1e-8, 1e-5, [0.5, 0.75, 1.0]),
+            "narrower interface range (1e-8..1e-7)": (1e-8, 1e-7, [0.5, 0.75, 1.0]),
+        }
+        res = {"definition": "1 - E[Var(delta | input)] / Var(delta) over a uniform grid of the stated ranges; "
+                             "grid means over 3 seeds (geometry noise included in the spread)",
+               "variants": {k: shares(*v) for k, v in variants.items()}}
+        ref = next(iter(res["variants"].values()))
+        res.update(ref)  # reference shares at top level (backwards compatible)
         _json(self.path("questions", "q4.json"), res)
         return res
 
     def q2(self) -> dict:
+        """Contact-resistance decision boundary with bootstrap intervals.
+
+        Uses the confirmation seeds and the refined (reported) mesh, so the reference-thickness
+        values of the recommended pair are exactly the confirmation-batch values in the report.
+        A second pair (medium-size ladder design vs its own random-orientation baseline) is run
+        at every thickness so the thickness trend can be tested even where the recommended
+        distribution does not fit in the layer.
+        """
         c = self._final_designs()
-        key = {"recommended": c["recommended"], "baseline_random_orientation": c["baseline_random_orientation"]}
+        med = self._size_ladder(c["recommended"])["medium_particles_aligned"]
+        pairs = {"recommended": (c["recommended"], c["baseline_random_orientation"]),
+                 "medium_particles_aligned": (med, med.with_(order=0.0))}
+        seeds = self.budget["confirm_seeds"]
+        ms_ref = replace(self.cfg.mesh, size_factor=float(self.budget["final_refinements"][0]))
+        t0 = self.cfg.layer.thickness
+        lab = {}
+        for pname, (cd, bd) in pairs.items():
+            lab[config_hash(cd.to_dict(), 12)] = (pname, "candidate")
+            lab[config_hash(bd.to_dict(), 12)] = (pname, "baseline")
+        designs = [d for pr in pairs.values() for d in pr]
         rows = []
-        # layer resistance at three thicknesses (fresh seeds, loop mesh)
-        for t in (50e-6, 100e-6, 150e-6):
-            layer = replace(self.cfg.layer, thickness=t, width=2 * t)
-            r = self.run(list(key.values()), [3000, 3001, 3002, 3003], f"q2-t{int(t * 1e6)}", layer=layer)
-            rows.append(r)
+        for f in (0.5, 1.0, 1.5):
+            layer = self.cfg.layer if f == 1.0 else replace(self.cfg.layer, thickness=f * t0, width=2 * f * t0)
+            rows.append(self.run(designs, seeds, f"q2-t{f * t0 * 1e6:.0f}", layer=layer, mesh=ms_ref))
         rows = pd.concat(rows, ignore_index=True)
-        lab = {config_hash(d.to_dict(), 12): k for k, d in key.items()}
-        rows["label"] = rows["design_id"].map(lab)
-        # Robin check of the series reduction at the nominal interface
+        rows["pair"] = rows["design_id"].map(lambda x: lab[x][0])
+        rows["role"] = rows["design_id"].map(lambda x: lab[x][1])
+        # Robin check of the series reduction at the nominal interface (same seeds and mesh)
         robin_sc = [replace(self.nominal, name=f"robin_{rc:.0e}", r_top=rc, r_bottom=rc) for rc in (1e-5, 1e-4)]
-        rb = self.run([key["recommended"], key["baseline_random_orientation"]], [3000, 3001], "q2-robin",
-                      scenarios=robin_sc, contact_model="robin")
-        rb["label"] = rb["design_id"].map(lab)
+        rb = self.run(designs, seeds[:2], "q2-robin", scenarios=robin_sc, contact_model="robin", mesh=ms_ref)
+        rb["pair"] = rb["design_id"].map(lambda x: lab[x][0])
+        rb["role"] = rb["design_id"].map(lambda x: lab[x][1])
         self.save(rows, "questions", "q2_rows.parquet")
         self.save(rb, "questions", "q2_robin_rows.parquet")
         ok = rows[rows["status"] == "ok"]
-        g = ok.groupby(["label", "thickness", "scenario"]).agg(r=("r_layer", "mean"), sd=("r_layer", "std"),
-                                                                n=("seed", "nunique")).reset_index()
         contacts = np.array([0, 1e-6, 3e-6, 1e-5, 3e-5, 1e-4, 3e-4])
-        recs, bounds = [], {}
-        for (t, sc), sub in g.groupby(["thickness", "scenario"]):
-            s = sub.set_index("label")
-            if "baseline_random_orientation" not in s.index or "recommended" not in s.index:
-                continue
-            rb_, rc_ = s.loc["baseline_random_orientation", "r"], s.loc["recommended", "r"]
-            dR = rb_ - rc_
-            for rct in contacts:
-                recs.append({"thickness": t, "scenario": sc, "r_contact_total": rct, "r_layer_baseline": rb_,
-                             "r_layer_candidate": rc_, "benefit_abs": dR,
-                             "benefit_rel_total": dR / (rb_ + rct), "contact_share_baseline": rct / (rb_ + rct)})
-            for thr in (0.10, 0.05):
-                bounds.setdefault(f"{thr:.2f}", {}).setdefault(f"{t * 1e6:.0f}um", {})[sc] = max(0.0, dR / thr - rb_)
+        recs, bounds, layer_tab, zero = [], {}, [], {}
+        infeasible = {}
+        for pname in pairs:
+            for f in (0.5, 1.0, 1.5):
+                t = f * t0
+                tkey = f"{t * 1e6:.0f}um"
+                sub_t = ok[(ok["pair"] == pname) & np.isclose(ok["thickness"], t)]
+                if sub_t["role"].nunique() < 2:
+                    infeasible.setdefault(pname, []).append(tkey)
+                    continue
+                for sc, sub in sub_t.groupby("scenario"):
+                    bv = sub[sub["role"] == "baseline"].sort_values("seed")["r_layer"].to_numpy()
+                    cv = sub[sub["role"] == "candidate"].sort_values("seed")["r_layer"].to_numpy()
+                    if bv.size < 3 or cv.size < 3:
+                        continue
+                    layer_tab.append({"pair": pname, "thickness": t, "scenario": sc, "r_baseline": bv.mean(),
+                                      "r_baseline_se": bv.std(ddof=1) / math.sqrt(bv.size), "r_candidate": cv.mean(),
+                                      "r_candidate_se": cv.std(ddof=1) / math.sqrt(cv.size),
+                                      "n_baseline": bv.size, "n_candidate": cv.size})
+                    for rct in contacts:
+                        bs = bootstrap({"b": bv, "c": cv}, lambda b, c, rct=rct: (b - c) / (b + rct), n=2000, seed=1)
+                        recs.append({"pair": pname, "thickness": t, "scenario": sc, "r_contact_total": rct,
+                                     "r_layer_baseline": bv.mean(), "r_layer_candidate": cv.mean(),
+                                     "benefit_abs": bv.mean() - cv.mean(), "benefit_rel_total": bs["estimate"],
+                                     "benefit_ci_low": bs["ci_low"], "benefit_ci_high": bs["ci_high"],
+                                     "contact_share_baseline": rct / (bv.mean() + rct)})
+                        if rct == 0:
+                            zero.setdefault(pname, {})[f"{tkey}/{sc}"] = bs
+                    for thr in (0.10, 0.05):
+                        bs = bootstrap({"b": bv, "c": cv}, lambda b, c, thr=thr: max(0.0, (b - c) / thr - b), n=4000, seed=2)
+                        bounds.setdefault(f"{thr:.2f}", {}).setdefault(pname, {}).setdefault(tkey, {})[sc] = bs
         q2 = pd.DataFrame(recs)
         self.save(q2, "questions", "q2_benefit.parquet")
+        self.save(pd.DataFrame(layer_tab), "questions", "q2_layer_resistances.parquet")
         # series reduction check: R_top + R_layer(isothermal faces) + R_bottom vs the Robin assembly solve
         rbok = rb[rb["status"] == "ok"]
-        iso = ok[np.isclose(ok["thickness"], self.cfg.layer.thickness) & (ok["scenario"] == self.nominal.name)].set_index(["label", "seed"])["r_layer"]
+        iso = ok[np.isclose(ok["thickness"], t0) & (ok["scenario"] == self.nominal.name)].set_index(["design_id", "seed"])["r_layer"]
         recs_r = []
         for _, r in rbok.iterrows():
-            r_iso = iso.get((r["label"], r["seed"]))
+            r_iso = iso.get((r["design_id"], r["seed"]))
             if r_iso is None:
                 continue
             series = r["r_top"] + r_iso + r["r_bottom"]
-            recs_r.append({"label": r["label"], "scenario": r["scenario"], "seed": r["seed"], "r_contact_each": r["r_top"],
-                           "r_total_robin": r["r_total"], "r_total_series": series,
+            recs_r.append({"pair": r["pair"], "role": r["role"], "scenario": r["scenario"], "seed": r["seed"],
+                           "r_contact_each": r["r_top"], "r_total_robin": r["r_total"], "r_total_series": series,
                            "series_error_rel": (series - r["r_total"]) / r["r_total"]})
         robin = pd.DataFrame(recs_r)
         self.save(robin, "questions", "q2_robin.parquet")
-        feas = ok.groupby(["label", "thickness"])["seed"].nunique().unstack().fillna(0).astype(int)
+        # realizations rejected per pair, role and thickness (a design with any rejection is excluded)
+        rejected = {}
+        fpath = self.out / "failures.parquet"
+        if fpath.exists():
+            fl = pd.read_parquet(fpath)
+            fl = fl[fl["tag"].str.startswith("q2-t")]
+            for did, (pname, role) in lab.items():
+                for tag, n in fl[fl["design_id"] == did].groupby("tag")["seed"].nunique().items():
+                    rejected.setdefault(pname, {}).setdefault(role, {})[tag.replace("q2-t", "") + "um"] = (
+                        f"{n}/{len(seeds)} realizations rejected: "
+                        + str(fl[(fl["design_id"] == did) & (fl["tag"] == tag)]["reason"].iloc[0])[:90])
         res = {
+            "seeds": seeds,
+            "mesh_size_factor": ms_ref.size_factor,
+            "pairs": {k: {"candidate": v[0].to_dict(), "baseline": v[1].to_dict()} for k, v in pairs.items()},
+            "rejected_realizations": rejected,
+            "infeasible_thicknesses": infeasible,
             "contact_total_where_benefit_falls_to": bounds,
+            "benefit_at_zero_contact": zero,
             "robin_vs_series_max_rel_diff": float(robin["series_error_rel"].abs().max()) if len(robin) else None,
-            "seeds_solved_by_label_and_thickness": {f"{k}": {f"{t * 1e6:.0f}um": int(v) for t, v in row.items()}
-                                                    for k, row in feas.iterrows()},
-            "note": "Identical series contacts cannot reorder candidates; they reduce the relative benefit.",
+            "robin_vs_series_by_pair": robin.groupby("pair")["series_error_rel"].apply(lambda x: float(x.abs().max())).to_dict()
+            if len(robin) else {},
+            "note": "Identical series contacts cannot reorder candidates; they reduce the relative benefit. "
+                    "Thresholds amplify noise ~10x (threshold = dR/0.1 - R_baseline), hence the bootstrap intervals.",
         }
         _json(self.path("questions", "q2.json"), res)
         return res
@@ -684,7 +895,7 @@ class Study:
             "margin_6um": ({"layer": replace(lay, margin=6e-6)}, ro, base),
             "width_x2": ({"layer": replace(lay, width=2 * lay.width)}, ro, base),
         }
-        seeds = [4000, 4001, 4002, 4003]
+        seeds = self.budget.get("perturbation_seeds", [4000, 4001, 4002, 4003])
         allrows = []
         for name, (ov, dc, db) in variants.items():
             ds = [dc] + ([db] if db is not None else [])
@@ -742,42 +953,41 @@ class Study:
 
         entries = yaml.safe_load(reg)["entries"]
         bn_ready = all(e["status"] in ("measured", "inferred") for e in entries if e["id"] in ("SR-001", "SR-009"))
-        # compare methods on their *verified* (fresh-seed, refined-mesh) results, with uncertainty
-        v, lo = fin["verified"], fin["label_of"]
-        bo_labels = [l for l in ("robust_opt", "shortlist_2", "shortlist_3", "nominal_opt") if l in lo]
-        bo_best = min((v[lo[l]] for l in bo_labels), key=lambda x: x["robust"])
-
-        def better(a, b):  # a lower than b by more than 2 SE
-            return bool(b["robust"] - a["robust"] > 2 * math.hypot(a["robust_se"], b["robust_se"]))
-
-        rnd_v, sw_v = v[lo["random_search_best"]], v[lo["sweep_best"]]
+        # compare methods on the confirmation batch: each method's best-of-four (chosen on the
+        # verification batch) re-run on independent seeds. One campaign per method, so these
+        # are statements about this campaign, not about the methods in general.
+        mc = fin["method_comparison_confirmed"]
+        p_adj = holm({k: v["p"] for k, v in mc.items()})
+        resolved = {k: bool(mc[k]["diff"] > 0 and p_adj[k] < 0.05) for k in mc}
         checks = {
             "solver_checks_pass": all(r["passed"] for r in ver),
             "source_supported_bn_case_defined": bn_ready,
             "heldout_median_error_below_5pct": cv["gaussian_process"]["median_rel_error"] < TARGET_HELDOUT_ERROR,
             "finalist_top1_survives_direct_check": fin["top1_survives"],
-            "loop_top1_within_2se_of_verified_best": fin["top1_within_2se_of_verified_best"],
-            "bo_better_than_random_at_matched_budget": better(bo_best, rnd_v),
-            "bo_better_than_sweep": better(bo_best, sw_v),
+            "loop_top1_not_resolved_from_verified_best": fin["top1_not_resolved_from_verified_best"],
+            "bo_resolved_better_than_random_this_campaign": resolved["random_search_minus_bayesian_optimisation"],
+            "bo_resolved_better_than_sweep_this_campaign": resolved["sweep_minus_bayesian_optimisation"],
             "numerical_error_below_claimed_benefit": fin["numerical_error_below_claim"],
         }
         required = ("solver_checks_pass", "source_supported_bn_case_defined", "heldout_median_error_below_5pct",
-                    "finalist_top1_survives_direct_check", "bo_better_than_random_at_matched_budget",
+                    "finalist_top1_survives_direct_check", "bo_resolved_better_than_random_this_campaign",
                     "numerical_error_below_claimed_benefit")
         proceed = all(checks[k] for k in required)
         res = {
             "checks": checks,
             "proceed_to_phase2": proceed,
-            "ml_earns_its_complexity": checks["bo_better_than_random_at_matched_budget"] and checks["bo_better_than_sweep"],
+            "ml_earns_its_complexity": checks["bo_resolved_better_than_random_this_campaign"]
+            and checks["bo_resolved_better_than_sweep_this_campaign"],
             "required": list(required),
             "blocking": [k for k in required if not checks[k]],
             "informational_unmet": [k for k, ok in checks.items() if not ok and k not in required],
-            "verified_best_robust": {"bayesian_optimisation": bo_best["robust"], "random_search": rnd_v["robust"],
-                                     "sweep": sw_v["robust"]},
-            "verified_best_robust_se": {"bayesian_optimisation": bo_best["robust_se"], "random_search": rnd_v["robust_se"],
-                                        "sweep": sw_v["robust_se"]},
+            "method_picks": fin["method_picks"],
+            "confirmed_pick_robust": {m: fin["confirmed"][l]["robust"] for m, l in fin["method_picks"].items()},
+            "confirmed_pick_robust_se": {m: fin["confirmed"][l]["robust_se"] for m, l in fin["method_picks"].items()},
+            "method_comparison_p_holm": p_adj,
             "solver_calls_to_within_1pct": {k: comp[k]["calls_to_within_1pct_of_overall_best"]
                                             for k in ("bayesian_optimisation", "random_search", "sweep")},
+            "note": "single campaign per method; 'not resolved' is not equivalence",
         }
         _json(self.path("gate.json"), res)
         return res
@@ -792,6 +1002,9 @@ def _variance_reduction(df: pd.DataFrame, col: str, inputs: dict) -> dict:
     out = {"total_sd": math.sqrt(total), "mean": float(df[col].mean()), "range": float(df[col].max() - df[col].min()),
            "fraction_positive": float((df[col] > 0).mean())}
     for name, c in inputs.items():
+        if df[c].nunique() < 2:  # input not varied in the available data (e.g. infeasible levels)
+            out[f"variance_reduction_{name}"] = float("nan")
+            continue
         cond = float(df.groupby(c)[col].var(ddof=0).mean())
         out[f"variance_reduction_{name}"] = 1.0 - cond / total if total > 0 else 0.0
     return out

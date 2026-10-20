@@ -1,45 +1,81 @@
 {
   "winners_supported_range": {
-    "small_particles_aligned": 24,
-    "recommended": 21
+    "medium_particles_aligned": 27,
+    "small_particles_aligned": 12,
+    "large_particles_aligned": 3,
+    "recommended": 3
   },
   "winners_all": {
-    "small_particles_aligned": 36,
-    "recommended": 27,
-    "large_particles_aligned": 18
+    "medium_particles_aligned": 39,
+    "small_particles_aligned": 18,
+    "recommended": 15,
+    "large_particles_aligned": 9
   },
   "baseline_ever_wins_supported": false,
-  "indistinguishable_fraction_supported": 1.0,
-  "reversals": [
+  "indistinguishable_fraction_supported": 0.9333333333333333,
+  "seeds_per_cell": 3,
+  "cell_test": "Welch two-sample test of winner vs runner-up, p < 0.05 (screening only, not Holm-corrected)",
+  "coarse_grid_crossings": [
+    {
+      "a": "baseline_random_orientation",
+      "b": "small_particles_aligned",
+      "between": [
+        3e-06,
+        1e-05
+      ],
+      "crossing_estimate": 4.1550114390438286e-06,
+      "better_below": "small_particles_aligned"
+    },
     {
       "a": "large_particles_aligned",
-      "b": "recommended",
+      "b": "medium_particles_aligned",
       "between": [
         1e-06,
         3e-06
       ],
-      "crossing_estimate": 1.5030255571165067e-06,
-      "better_below": "recommended"
+      "crossing_estimate": 1.6850211212542622e-06,
+      "better_below": "medium_particles_aligned"
     },
     {
       "a": "large_particles_aligned",
       "b": "small_particles_aligned",
       "between": [
-        1e-06,
-        3e-06
+        3e-07,
+        1e-06
       ],
-      "crossing_estimate": 1.1219100120382528e-06,
+      "crossing_estimate": 8.029758272869559e-07,
+      "better_below": "small_particles_aligned"
+    },
+    {
+      "a": "medium_particles_aligned",
+      "b": "recommended",
+      "between": [
+        3e-06,
+        1e-05
+      ],
+      "crossing_estimate": 3.9535713932111946e-06,
+      "better_below": "medium_particles_aligned"
+    },
+    {
+      "a": "medium_particles_aligned",
+      "b": "small_particles_aligned",
+      "between": [
+        3e-07,
+        1e-06
+      ],
+      "crossing_estimate": 4.034554311362324e-07,
       "better_below": "small_particles_aligned"
     },
     {
       "a": "recommended",
       "b": "small_particles_aligned",
       "between": [
-        3e-07,
-        1e-06
+        1e-06,
+        3e-06
       ],
-      "crossing_estimate": 6.019187794009623e-07,
+      "crossing_estimate": 1.4534014067343462e-06,
       "better_below": "small_particles_aligned"
     }
-  ]
+  ],
+  "note": "coarse-grid crossings are crossings of sample means at 3 seeds; see q1_crossings.json for dense-grid, 12-seed bootstrap intervals"
 }

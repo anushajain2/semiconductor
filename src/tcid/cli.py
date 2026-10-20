@@ -108,7 +108,7 @@ def cmd_stage(name):
             out = s.final()
         elif name == "questions":
             s.q1_q4_grid()
-            out = {"q1": s.q1(), "q4": s.q4(), "q2": s.q2(), "q3": s.q3()}
+            out = {"q1": s.q1(), "q1_crossings": s.q1_crossings(), "q4": s.q4(), "q2": s.q2(), "q3": s.q3()}
         elif name == "gate":
             out = s.gate()
         else:

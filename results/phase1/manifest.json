@@ -1,7 +1,7 @@
 {
-  "created": "2026-10-19T22:09:07+00:00",
-  "code_version": "tcid-0.1.0@uncommitted+dirty",
-  "config_hash": "29f06202011fa528",
+  "created": "2026-10-20T07:50:26+00:00",
+  "code_version": "tcid-0.1.0@0696d2c+dirty",
+  "config_hash": "bba2a5c62d6f4095",
   "config": {
     "study": {
       "name": "phase1_alumina_epoxy_2d",
@@ -75,6 +75,48 @@
           1003,
           1004,
           1005
+        ],
+        "confirm_seeds": [
+          6000,
+          6001,
+          6002,
+          6003,
+          6004,
+          6005,
+          6006,
+          6007,
+          6008,
+          6009,
+          6010,
+          6011
+        ],
+        "perturbation_seeds": [
+          4000,
+          4001,
+          4002,
+          4003,
+          4004,
+          4005,
+          4006,
+          4007,
+          4008,
+          4009,
+          4010,
+          4011
+        ],
+        "crossing_seeds": [
+          2000,
+          2001,
+          2002,
+          2003,
+          2004,
+          2005,
+          2006,
+          2007,
+          2008,
+          2009,
+          2010,
+          2011
         ],
         "final_refinements": [
           0.7,
@@ -163,53 +205,58 @@
     },
     {
       "path": "failures.parquet",
-      "bytes": 19585,
-      "sha256": "9f2e5471a3b33f703fd8182df0b7a1210fa30337a782a6a4710a2894ccbdaa61"
+      "bytes": 23203,
+      "sha256": "ad9dff9078ad338cbb2d6beb3b71ff4569e8334c4f398a9cf1b464ac60367705"
     },
     {
-      "path": "fields/b629dc36a2acf259.npz",
-      "bytes": 4032290,
-      "sha256": "d6cb482f913768f5549b14f3ca014597105a5609148c3fb1bec8cf3cf39fd83d"
+      "path": "fields/a27b0bce57234fb4.npz",
+      "bytes": 607974,
+      "sha256": "bfa8491e01b6544bfd9808311bb351c90cdffa4384a7dfb67f2c2ef6c135a859"
     },
     {
-      "path": "fields/ce9964348756174b.npz",
-      "bytes": 4159445,
-      "sha256": "59c7cc04fbea0bfc0e07961bb441fef63be78bc4e53f9c2a329a9243e0d1f6d6"
+      "path": "fields/a9c7d1099a46f06a.npz",
+      "bytes": 572995,
+      "sha256": "bb9bab6d4e67f9d155305b8f4a2611259dbcda978cbd251c8b1104ff491c49db"
     },
     {
       "path": "final/candidates.json",
-      "bytes": 2970,
-      "sha256": "ef6c88100944ac894e04eb18c3adbb112dae1fc061b2a5afab4e18a07faf16b7"
+      "bytes": 5334,
+      "sha256": "cc0f75b99a51c4a74d10f659ab981bfeec523ac18b7f24762fe326c2c5b4d29d"
+    },
+    {
+      "path": "final/confirmation_summary.parquet",
+      "bytes": 11142,
+      "sha256": "b115a302f30d7f7a6ff583cc86fe0a0c85150a27e97b4e164b3871671426a85f"
     },
     {
       "path": "final/final.json",
-      "bytes": 9797,
-      "sha256": "90cd9d0891e54c707ae566a9f48aab8f7cccec0a3a6cdf245360054a2b24cd3f"
+      "bytes": 25651,
+      "sha256": "39f40d1d7e7faf3525ef1b74907c66e2797659ee7077347cb5295147fc562ad7"
     },
     {
       "path": "final/final_rows.parquet",
-      "bytes": 113979,
-      "sha256": "3e01686462d7cdffa0ceaae3543ae93613d3122939904ee1653da263b2f3f92b"
+      "bytes": 277454,
+      "sha256": "16f120bbfc699b855164e08d74b6606aa8c779c8969d4cf367ce357f36fced66"
     },
     {
       "path": "final/final_summary.parquet",
-      "bytes": 12272,
-      "sha256": "360f65d897c4e365fef00a4f7aaba587a4ccf407ad13a2077d917137b5ae90f6"
+      "bytes": 16064,
+      "sha256": "4446d033ee2e344a8f758bf4237fa682d0f09544221c9647d097bcce716aebbf"
     },
     {
       "path": "final/mesh_refinement.parquet",
-      "bytes": 6282,
-      "sha256": "795abeeea067429f442e5270ecb70df251eed58915f330c9b14c9aa4f788517a"
+      "bytes": 6268,
+      "sha256": "64048abf78ecca82ae490be0d23af55acb3bff98189ea53d2851f6f57c588be4"
     },
     {
       "path": "final/paired_differences.parquet",
-      "bytes": 5302,
-      "sha256": "cc38615848bc912c462d2155b20d108120dc2904c67087bab024bab3d0176a7a"
+      "bytes": 9632,
+      "sha256": "d970366f08ca99a40ea9548a58232e04f995e0c59c8eed8156f7b03fb73aeccc"
     },
     {
       "path": "gate.json",
-      "bytes": 1326,
-      "sha256": "8b4e5d158fb5fc9a8a2776fef65704751b536f7ed2f374839add9ee546156875"
+      "bytes": 1765,
+      "sha256": "a650026b3743b13a01065ea054cd3f18a70cd3720aed7c9bf5a7bfe63361cbda"
     },
     {
       "path": "pilot/pilot.json",
@@ -223,68 +270,88 @@
     },
     {
       "path": "questions/q1.json",
-      "bytes": 1018,
-      "sha256": "1ceb80f573a6d4ca3c765582b53487e2576d3036caa8103fcfadf45518fbb009"
+      "bytes": 2180,
+      "sha256": "4df7964b2703e6b2eddc250490f5c9aededf8628fa7f49b9c8a5b77e649f8dcd"
+    },
+    {
+      "path": "questions/q1_crossing_curves.parquet",
+      "bytes": 5113,
+      "sha256": "310b9bdf3566c9587427181a3c5abe1af445b936e1029113b577fe6acada83d6"
+    },
+    {
+      "path": "questions/q1_crossing_rows.parquet",
+      "bytes": 120867,
+      "sha256": "2fd872443d2a44a742d56c6683759b4a499a84e7ddab1e550438196007e04cea"
+    },
+    {
+      "path": "questions/q1_crossings.json",
+      "bytes": 3692,
+      "sha256": "e4480785cff38b78cb88c9092be381f6b2de1f9f61227df723385d3d50435b41"
     },
     {
       "path": "questions/q1_map.parquet",
-      "bytes": 7609,
-      "sha256": "4d3bc60303f44add9aaa423cf98e3ca0002f8af7767d46e08e4c0ebcd9824172"
+      "bytes": 8903,
+      "sha256": "24e7aac10e7d8848f00475e7c9b2dcec024ac440cde927dd06b5264f74c38bc4"
     },
     {
       "path": "questions/q1_summary.parquet",
-      "bytes": 12856,
-      "sha256": "ddf756dc16880ecfa507308a8e6ea95ec05cfd731a3f9e5a4df4343440fe39a0"
+      "bytes": 13623,
+      "sha256": "a4a8d4ad8d03dd4923b7ba0a902d86061e59057a27060c9f3138310f32e678e0"
     },
     {
       "path": "questions/q1q4_rows.parquet",
-      "bytes": 141905,
-      "sha256": "d16da0a464f725adfb3c3d1a03170cc20eea6813f6ddb2538e59944b88878430"
+      "bytes": 151501,
+      "sha256": "c404dc4396d0c76350ea68c719f80f50e6d434854b32c64a8e8b427fa89d8fc0"
     },
     {
       "path": "questions/q2.json",
-      "bytes": 2137,
-      "sha256": "f90fb53e595a3a908b7e77b0885cabb6dc195f9c598f4c07bbe5ffc13b1307c1"
+      "bytes": 17241,
+      "sha256": "67209a04e6f0b3a00f19406f8d54845c8837de232a0d84f5f800a9afa1933b17"
     },
     {
       "path": "questions/q2_benefit.parquet",
-      "bytes": 8079,
-      "sha256": "8b0eef1da47a66c8941718b963f5db53785922b8a18d72da8204a3fe781fcb75"
+      "bytes": 13239,
+      "sha256": "07bfedc46100ab9da5a8b88468eab9cb5efd07f68567c0bef22682fbc70ba79e"
+    },
+    {
+      "path": "questions/q2_layer_resistances.parquet",
+      "bytes": 6672,
+      "sha256": "0d6bdbd6236a39d2954402ceedc3d6ea7fa741ef6c2c1a42357f8bde8493c315"
     },
     {
       "path": "questions/q2_robin.parquet",
-      "bytes": 5004,
-      "sha256": "b6c88cdb2e742c38771920050b531e2d5507180e4ba176dcd443c0ce72445c6f"
+      "bytes": 5707,
+      "sha256": "c6cbd9b64ad663161ed5995a26fe9e16ad7053f15c84799378ab34a5f4cda36a"
     },
     {
       "path": "questions/q2_robin_rows.parquet",
-      "bytes": 44673,
-      "sha256": "efc456df1c5134c47732e6a3b24e21a4b05bb5e39aa5726ef0e56897c9d631f5"
+      "bytes": 46947,
+      "sha256": "397603a92427623d12663a431153b5699799a0d35fc08b03a119075bc37cbd46"
     },
     {
       "path": "questions/q2_rows.parquet",
-      "bytes": 62848,
-      "sha256": "4b2e91cdb63dc08825ee5989337e7a9d515391574e1fd4eee79a4e66bc095b81"
+      "bytes": 122888,
+      "sha256": "eaa19d8907dc695b820ec777953fc3d8925d27f4ae2d6819d1f5fd770f3f728b"
     },
     {
       "path": "questions/q3.json",
-      "bytes": 1824,
-      "sha256": "378036e171b2d060e308a16ba55e09d4e441ac3449d417c93fc3d9ae9e4bc926"
+      "bytes": 1760,
+      "sha256": "43b0c9070889079fb51cb3df2d662a278382bde9dbd74b1b3ef3cf61a6d07959"
     },
     {
       "path": "questions/q3_advantage.parquet",
-      "bytes": 7828,
-      "sha256": "bea12c71e4e36495e59914c3e6145fb0c9c0d3fdc3ec53ea28743a93a9095c67"
+      "bytes": 7621,
+      "sha256": "a28993072c9b69c7f473c3bac7f8e1a8fe6b0b066ada313d224ae11247ea4599"
     },
     {
       "path": "questions/q3_rows.parquet",
-      "bytes": 108510,
-      "sha256": "fa3c2aa6470ae7458f32c4c49f41e283bbbc4ebb8147e08361eca5810dd251d5"
+      "bytes": 213796,
+      "sha256": "eb872e6b21890811d8dc388bfcb62aa23debf459b3c3d1565ed69789d0136d29"
     },
     {
       "path": "questions/q4.json",
-      "bytes": 1521,
-      "sha256": "d995a1933dd17ce0af5a43f62ab38ee28d732c91bc90f89d256b672dd31df212"
+      "bytes": 10484,
+      "sha256": "28ee0ba89c5b615bb6ee21453366da0e7a66eba1f135c2daa3293c476b973f49"
     },
     {
       "path": "search/best_so_far.parquet",
