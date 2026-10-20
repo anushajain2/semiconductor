@@ -1,5 +1,7 @@
 # tcid: thermal composite inverse design
 
+[![tests](https://github.com/anushajain2/semiconductor/actions/workflows/tests.yml/badge.svg)](https://github.com/anushajain2/semiconductor/actions/workflows/tests.yml)
+
 A research tool that recommends particle **size** and **orientation distributions** for a
 ceramic-filled epoxy adhesive layer, then checks whether the thermal benefit survives
 uncertain interfaces and geometric variability. The application is semiconductor packaging
@@ -17,13 +19,14 @@ nitride**. See [`docs/report.md`](docs/report.md) for the technical report and
 
 | Component | Implementation |
 |---|---|
-| Geometry | Non-overlapping ellipses inside a finite layer with a resin-rich margin; five descriptors (loading, median diameter, log-normal width, aspect ratio, orientation order about a preferred direction). Impossible requests are rejected with a reason; achieved loading, minimum gap, seed and generator version are recorded. |
+| Geometry | Non-overlapping ellipses inside a finite layer with a resin-rich margin; five descriptors (loading, median diameter, log-normal width, aspect ratio, orientation order about a preferred direction). Rejections are categorised: geometric constraint (cannot fit under the size rules) vs generator budget (random sequential placement gave up, which is not proof of impossibility). A deterministic shelf construction checks excluded cases for feasibility. Achieved loading, minimum gap, seed and generator version are recorded. |
 | Mesh | Gmsh conforming triangulation; polygon vertices on the exact ellipses; ≥ 3 elements across every narrow gap and ≥ 2 across the margin; automatic detection of single-element gap bridges. |
 | Physics | Steady anisotropic conduction (scikit-fem P1 + SciPy). Particle–matrix interface resistance via duplicated interface DOFs and an interface-conductance term; perfect contact by tying DOFs; rotated particle tensors; isothermal faces, insulated sidewalls; outer contact resistances in series or as Robin conditions. |
 | Verification | Homogeneous and layered analytic cases, energy balance, mesh refinement, rotation invariance, geometry validity, pure-phase limits, monotonicity, Wiener bounds (`tcid verify`). |
 | Surrogate | Gaussian process over the design descriptors and uncertain physical inputs, predicting log resistance with seed-variance noise; extra-trees alternative; design-grouped cross-validation. |
 | Search | Robust (worst-scenario) Bayesian optimisation with exploration points, compared against matched-budget random search and a 3-level sweep; shortlist re-simulated on fresh seeds and refined meshes. |
 | Studies | Q1 design map vs interface resistance and orientation variability; Q2 contact-resistance decision boundary at three thicknesses; Q3 geometric perturbations; Q4 value of information; Phase 2 gate. |
+| Recommendation | `tcid recommend` compares the complete requested configuration (every scenario's physical values, layer, gap, loading, material) with the inputs used for the stored results; any difference returns an unsupported response or, with `--run`, new solver runs. |
 | Traceability | Every solve stores its configuration hash, seed, achieved loading, particle statistics, properties, interface model, boundary conditions, mesh size, residual, heat balance, flux, resistance, timing, code version and status; cache keyed by the complete configuration; manifests with checksums. |
 
 ## Install
@@ -45,6 +48,7 @@ tcid geometry --d50 10um --aspect 3 --order 0.8 --plot geom.png
 tcid solve examples/case.yaml                 # one configured case over the scenario set
 tcid all                                      # full Phase 1 pipeline (about 1 h on 4 cores)
 tcid recommend --thickness "100 um" --loading 0.30
+tcid benchmark                                # from a clean tagged checkout: recompute stored solves, no cache
 ```
 
 Pipeline stages can be run one at a time:
@@ -62,6 +66,21 @@ results/            verification, pilot, design loop, final verification, resear
 docs/               report, worked example, pre-registered hypotheses, figures
 examples/           a single-case configuration for `tcid solve`
 ```
+
+## Reproducibility
+
+* Releases are tagged (`v0.2.0` onward). `tcid benchmark`, run from a clean checkout of a tag,
+  re-runs the solver gates and recomputes a subset of the stored confirmation-batch solves
+  **without the cache**, checking that they match the committed results to 1e-9 relative.
+  Its output (`results/benchmark/benchmark.json`) records the exact commit it ran from.
+* The Phase 1 study results were generated from working trees recorded as `+dirty`; the
+  benchmark links them to tagged source by exact recomputation.
+* CI runs the test suite on every push (`.github/workflows/tests.yml`).
+* `docs/gate_v2.md` fixes the Phase 2 gate before any Phase 2 run.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
 
 ## Limits
 

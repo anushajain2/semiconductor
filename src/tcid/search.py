@@ -124,7 +124,8 @@ def propose_batch(
 
 
 def bayes_opt(
-    run, rows: pd.DataFrame, space: DesignSpace, scenarios, material, iterations: int, batch: int, explore: int, seed: int
+    run, rows: pd.DataFrame, space: DesignSpace, scenarios, material, iterations: int, batch: int, explore: int, seed: int,
+    tag_prefix: str = "bo",
 ):
     """``run(designs, tag, kinds) -> rows`` evaluates designs with the physical solver."""
     from .provenance import config_hash
@@ -154,7 +155,7 @@ def bayes_opt(
         U, kinds, info = propose_batch(acq, space, evaluated_u, failed_u, best, top_u, batch, explore, seed + 100 * it)
         t_acq = time.perf_counter() - t1
         designs = [space.from_unit(u) for u in U]
-        new = run(designs, f"bo-{it + 1}", kinds)
+        new = run(designs, f"{tag_prefix}-{it + 1}", kinds)
         fails = new.attrs.get("failed_design_ids", set())
         for u, d in zip(U, designs):
             if config_hash(d.to_dict(), 12) in fails:

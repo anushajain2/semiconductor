@@ -60,3 +60,15 @@ def test_variance_reduction():
     r = _variance_reduction(df, "y", {"a": "a", "b": "b"})
     assert r["variance_reduction_a"] == pytest.approx(1.0)
     assert r["variance_reduction_b"] == pytest.approx(0.0)
+
+
+def test_gp_noise_is_scaled_to_normalised_units():
+    """With normalize_y=True the supplied per-point noise must be divided by var(y)."""
+    rng = np.random.default_rng(3)
+    X = rng.uniform(size=(30, 2))
+    y = 0.2 * np.sin(4 * X[:, 0]) + 0.05 * X[:, 1]
+    nv = np.full(30, 1e-4)
+    m = GPSurrogate(n_restarts=0).fit(X, y, nv)
+    assert np.allclose(m.model.alpha, np.maximum(nv / np.var(y), 1e-8))
+    m2 = GPSurrogate(n_restarts=0, normalize_y=False).fit(X, y, nv)
+    assert np.allclose(m2.model.alpha, nv)

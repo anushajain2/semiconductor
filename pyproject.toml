@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tcid"
-version = "0.1.0"
+version = "0.2.0"
 description = "Thermal composite inverse design: simulation-verified BN-epoxy microstructure design study (Phase 1: 2D verified solver and constrained search)"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -1,0 +1,170 @@
+  [15/150 jobs, 2s]
+  [30/150 jobs, 4s]
+  [45/150 jobs, 4s]
+  [60/150 jobs, 6s]
+  [75/150 jobs, 6s]
+  [90/150 jobs, 7s]
+  [105/150 jobs, 8s]
+  [120/150 jobs, 9s]
+  [135/150 jobs, 10s]
+  [150/150 jobs, 11s]
+  final: 150 jobs, 750 solves, 0 failures, 11s
+  [12/120 jobs, 2s]
+  [24/120 jobs, 2s]
+  [36/120 jobs, 4s]
+  [48/120 jobs, 4s]
+  [60/120 jobs, 5s]
+  [72/120 jobs, 6s]
+  [84/120 jobs, 6s]
+  [96/120 jobs, 8s]
+  [108/120 jobs, 10s]
+  [120/120 jobs, 10s]
+  confirm: 120 jobs, 600 solves, 0 failures, 10s
+  [1/2 jobs, 2s]
+  [2/2 jobs, 2s]
+  final-fields: 2 jobs, 2 solves, 0 failures, 2s
+  [1/4 jobs, 1s]
+  [2/4 jobs, 2s]
+  [3/4 jobs, 2s]
+  [4/4 jobs, 2s]
+  final-refine: 4 jobs, 20 solves, 0 failures, 2s
+  [1/4 jobs, 2s]
+  [2/4 jobs, 2s]
+  [3/4 jobs, 2s]
+  [4/4 jobs, 2s]
+  final-coarse: 4 jobs, 20 solves, 0 failures, 2s
+{
+  "seeds": [
+    1000,
+    1001,
+    1002,
+    1003,
+    1004,
+    1005
+  ],
+  "mesh_size_factor": 0.7,
+  "verified": {
+    "robust_opt": {
+      "design_id": "6d39bd4a6165",
+      "robust": 0.00018692347758618062,
+      "robust_se": 3.288739813204773e-06,
+      "nominal": 0.0001794016325638726,
+      "nominal_se": 3.3884027008514825e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 2.108874794890566e-05,
+        "sigma_ln": 0.05,
+        "aspect": 4.0,
+        "order": 0.8410684855286229,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_2": {
+      "design_id": "0882810a0295",
+      "robust": 0.00018357151887467805,
+      "robust_se": 9.783162178072557e-07,
+      "nominal": 0.00017271842517063317,
+      "nominal_se": 1.0546173503134906e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 9.606185231171466e-06,
+        "sigma_ln": 0.4010878925267659,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "shortlist_3": {
+      "design_id": "67d1f17409a2",
+      "robust": 0.00018548832215122254,
+      "robust_se": 1.8371218313140013e-06,
+      "nominal": 0.0001770872253670126,
+      "nominal_se": 1.9821645334532052e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.6647566939197593e-05,
+        "sigma_ln": 0.16727471096691776,
+        "aspect": 4.0,
+        "order": 0.95,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "nominal_opt": {
+      "design_id": "10286d789fb9",
+      "robust": 0.00018080499669751295,
+      "robust_se": 1.1744502652674407e-06,
+      "nominal": 0.0001674550225313283,
+      "nominal_se": 1.2825055500173945e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 6.717031019410964e-06,
+        "sigma_ln": 0.4176086102211366,
+        "aspect": 4.0,
+        "order": 0.8749549213108004,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_best": {
+      "design_id": "e362f2e70bfe",
+      "robust": 0.0001962449293344509,
+      "robust_se": 3.1954899188597344e-06,
+      "nominal": 0.00018753648681639606,
+      "nominal_se": 3.45737781884876e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.727008629099344e-05,
+        "sigma_ln": 0.22075077719764064,
+        "aspect": 3.9362436532336647,
+        "order": 0.5604921083600798,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_2": {
+      "design_id": "ff9082f955bf",
+      "robust": 0.00019391176940499027,
+      "robust_se": 1.540876990655732e-06,
+      "nominal": 0.0001821513924168223,
+      "nominal_se": 1.5652923061663464e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.1195048590155352e-05,
+        "sigma_ln": 0.06785888830655001,
+        "aspect": 3.4049932152756197,
+        "order": 0.9120673711748672,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_3": {
+      "design_id": "5f537f1c71c8",
+      "robust": 0.00020403935608010444,
+      "robust_se": 2.138367008494624e-06,
+      "nominal": 0.0001926739700201731,
+      "nominal_se": 2.2214988371468003e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 1.2619240739110178e-05,
+        "sigma_ln": 0.13300053910096052,
+        "aspect": 3.2784833958424175,
+        "order": 0.7198061312924693,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "random_search_4": {
+      "design_id": "1d3ec0555e56",
+      "robust": 0.00019906249121653616,
+      "robust_se": 1.3356589253214445e-06,
+      "nominal": 0.00018434758302939827,
+      "nominal_se": 1.4009613263053517e-06,
+      "design": {
+        "loading": 0.3,
+        "d50": 7.561808352061971e-06,
+        "sigma_ln": 0.28359431892319553,
+        "aspect": 3.2957421498355677,
+        "order": 0.8637203482910226,
+        "preferred_angle": 1.5707963267948966
+      }
+    },
+    "sweep_best": {
+      "design_id": "0d99d341ddf6",
+      "robust": 0.0001831139021210021,
+      "robust_se": 2.63371353130

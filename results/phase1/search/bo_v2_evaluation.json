@@ -1,0 +1,113 @@
+{
+  "plan": "docs/gate_v2.md",
+  "n_designs": 79,
+  "solver_calls": 1185,
+  "cpu_hours": 0.7213988871530553,
+  "training_acquisition_hours": 0.024720298225277715,
+  "best_robust_loop": 0.00017460077659539556,
+  "top4": {
+    "bo_v2_1": {
+      "loading": 0.3,
+      "d50": 1.1291892175160133e-05,
+      "sigma_ln": 0.37806755034911166,
+      "aspect": 4.0,
+      "order": 0.9489619650276495,
+      "preferred_angle": 1.5707963267948966
+    },
+    "bo_v2_2": {
+      "loading": 0.3,
+      "d50": 1.4833617383557604e-05,
+      "sigma_ln": 0.1632538637612015,
+      "aspect": 3.920427732169628,
+      "order": 0.898457254236564,
+      "preferred_angle": 1.5707963267948966
+    },
+    "bo_v2_3": {
+      "loading": 0.3,
+      "d50": 9.206078196128558e-06,
+      "sigma_ln": 0.41404017310911156,
+      "aspect": 4.0,
+      "order": 0.95,
+      "preferred_angle": 1.5707963267948966
+    },
+    "bo_v2_4": {
+      "loading": 0.3,
+      "d50": 9.915663887419027e-06,
+      "sigma_ln": 0.43822528324903437,
+      "aspect": 4.0,
+      "order": 0.95,
+      "preferred_angle": 1.5707963267948966
+    }
+  },
+  "verified_robust": {
+    "bo_v2_1": 0.0001820022476311712,
+    "bo_v2_2": 0.00018404360441012788,
+    "bo_v2_3": 0.0001817776583535664,
+    "bo_v2_4": 0.0001847669093677967
+  },
+  "pick": "bo_v2_3",
+  "confirmed_robust": 0.00018283406457598835,
+  "confirmed_robust_se": 1.3199705136281395e-06,
+  "comparisons_on_confirmation_batch": {
+    "bayesian_optimisation_minus_bo_v2": {
+      "diff": 1.0465864341992594e-07,
+      "se": 1.5676246608824924e-06,
+      "df": 18.727888129988163,
+      "ci_low": -3.1796471254774566e-06,
+      "ci_high": 3.3889644123173084e-06,
+      "p": 0.9474783127762487,
+      "n_a": 12,
+      "n_b": 12,
+      "other_label": "nominal_opt",
+      "p_holm": 0.9474783127762487
+    },
+    "random_search_minus_bo_v2": {
+      "diff": 8.554594306442383e-06,
+      "se": 1.6307701843597518e-06,
+      "df": 20.067679366086534,
+      "ci_low": 5.153602632825078e-06,
+      "ci_high": 1.1955585980059689e-05,
+      "p": 3.875669477917489e-05,
+      "n_a": 12,
+      "n_b": 12,
+      "other_label": "random_search_2",
+      "p_holm": 0.00011627008433752467
+    },
+    "sweep_minus_bo_v2": {
+      "diff": -4.3665229918251995e-06,
+      "se": 3.24620895959733e-06,
+      "df": 15.193456972962275,
+      "ci_low": -1.12779881921738e-05,
+      "ci_high": 2.544942208523401e-06,
+      "p": 0.19832319793079753,
+      "n_a": 12,
+      "n_b": 12,
+      "other_label": "sweep_3",
+      "p_holm": 0.39664639586159506
+    }
+  },
+  "cv": {
+    "gaussian_process": {
+      "n_points": 395,
+      "n_designs": 79,
+      "median_rel_error": 0.016574187955614862,
+      "p90_rel_error": 0.04722087922092763,
+      "max_rel_error": 0.10103641157483227,
+      "median_rel_error_low_resistance_quartile": 0.01215715199814653,
+      "coverage_95": 0.7620253164556962,
+      "spearman_within_scenario_mean": 0.9762999026290167
+    },
+    "extra_trees": {
+      "n_points": 395,
+      "n_designs": 79,
+      "median_rel_error": 0.01785988708116442,
+      "p90_rel_error": 0.0527635140611954,
+      "max_rel_error": 0.13424522412402234,
+      "median_rel_error_low_resistance_quartile": 0.014350660235856806,
+      "coverage_95": 0.9620253164556962,
+      "spearman_within_scenario_mean": 0.9683641674780915
+    },
+    "meets_target": true
+  },
+  "note": "methods follow-up; the Phase 1 recommendation is frozen"
+}

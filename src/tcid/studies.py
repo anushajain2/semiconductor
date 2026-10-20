@@ -25,7 +25,7 @@ import pandas as pd
 
 from .config import Design, load_study
 from .design_space import DesignSpace
-from .materials import Scenario, load_material, load_scenarios
+from .materials import Scenario, load_material, load_scenarios, params_for
 from .provenance import config_hash, write_manifest
 from .search import bayes_opt, best_so_far, design_objectives, job_cost
 from .simulate import make_jobs, run_jobs
@@ -214,6 +214,112 @@ class Study:
         self.save(sw, "search", "sweep_rows.parquet")
         return self.compare_methods()
 
+    def search_bo_v2(self) -> dict:
+        """Corrected-surrogate BO campaign (methods follow-up; plan in docs/gate_v2.md).
+
+        Same initial design, budget, seeds and acquisition settings as the original campaign;
+        only the GP noise scaling differs. Its best-of-four is verified and confirmed on the
+        existing seed batches and compared with the frozen confirmed picks. The Phase 1
+        recommendation is not re-opened.
+        """
+        b = self.budget
+        init = self.load("design", "initial_rows.parquet")
+
+        def run(designs, tag, kinds):
+            return self.run(designs, b["seeds"], tag, kinds)
+
+        rows, hist = bayes_opt(
+            run, init, self.space, self.scenarios, self.material,
+            int(b["bo_iterations"]), int(b["bo_batch"]), int(b["explore_per_batch"]), int(b["sobol_seed"]),
+            tag_prefix="bov2",
+        )
+        self.save(rows, "search", "bo_v2_rows.parquet")
+        _json(self.path("search", "bo_v2_history.json"), hist)
+        ns = len(self.stress)
+        obj = design_objectives(rows, n_stress=ns)
+        top = obj.nsmallest(4, "robust")
+        designs = {f"bo_v2_{i + 1}": self._design_from_obj(r) for i, (_, r) in enumerate(top.iterrows())}
+        ms_ref = replace(self.cfg.mesh, size_factor=float(b["final_refinements"][0]))
+        ver = self.run(list(designs.values()), b["final_seeds"], "bov2-verify", mesh=ms_ref)
+        stress_names = [s.name for s in self.stress]
+
+        def worst_values(rr, d):
+            sel = rr[(rr["design_id"] == config_hash(d.to_dict(), 12)) & rr["scenario"].isin(stress_names)]
+            if sel.empty:
+                return np.array([])
+            worst = sel.groupby("scenario")["r_layer"].mean().idxmax()
+            return sel[sel["scenario"] == worst].sort_values("seed")["r_layer"].to_numpy()
+
+        verified = {k: float(worst_values(ver, d).mean()) for k, d in designs.items() if worst_values(ver, d).size}
+        pick = min(verified, key=verified.get)
+        conf = self.run([designs[pick]], b["confirm_seeds"], "bov2-confirm", mesh=ms_ref)
+        pv = worst_values(conf, designs[pick])
+        fin = json.loads((self.out / "final" / "final.json").read_text())
+        frozen = pd.read_parquet(self.out / "final" / "final_rows.parquet")
+        frozen = frozen[frozen["tag"] == "confirm"]
+        cands = self._final_designs()
+        comps = {}
+        for m, lab in fin["method_picks"].items():
+            key = lab.split("+")[0]
+            other = worst_values(frozen, cands[key])
+            comps[f"{m}_minus_bo_v2"] = {**welch(other, pv), "other_label": lab}
+        p_adj = holm({k: v["p"] for k, v in comps.items()})
+        for k in comps:
+            comps[k]["p_holm"] = p_adj[k]
+        cv = self.surrogate(rows, name="bo_v2_loop")
+        cost = job_cost(rows)
+        res = {
+            "plan": "docs/gate_v2.md",
+            "n_designs": int(obj.shape[0]),
+            "solver_calls": int(cost["calls"].sum()),
+            "cpu_hours": float(cost["cpu_s"].sum() / 3600),
+            "training_acquisition_hours": float(sum(h["train_time_s"] + h["acquisition_time_s"] for h in hist) / 3600),
+            "best_robust_loop": float(obj["robust"].min()),
+            "top4": {k: d.to_dict() for k, d in designs.items()},
+            "verified_robust": verified,
+            "pick": pick,
+            "confirmed_robust": float(pv.mean()),
+            "confirmed_robust_se": float(pv.std(ddof=1) / math.sqrt(pv.size)),
+            "comparisons_on_confirmation_batch": comps,
+            "cv": {k: v for k, v in cv.items() if k != "target"},
+            "note": "methods follow-up; the Phase 1 recommendation is frozen",
+        }
+        _json(self.path("search", "bo_v2_evaluation.json"), res)
+        return res
+
+    def failed_work(self) -> pd.DataFrame:
+        """CPU time spent on rejected work per failed job.
+
+        Failure records written since v0.2.0 carry ``elapsed_s``. For older records the rejected
+        geometry attempt is re-run (deterministic: same design, seed and settings) and timed.
+        """
+        fpath = self.out / "failures.parquet"
+        if not fpath.exists():
+            return pd.DataFrame()
+        f = pd.read_parquet(fpath)
+        f = f[f["tag"].str.match(r"^(bo-|bov2-|random|sweep)")].drop_duplicates("job_key").copy()
+        cache = self.out / "search" / "failed_work.parquet"
+        known = pd.read_parquet(cache).set_index("job_key")["elapsed_s"].to_dict() if cache.exists() else {}
+        if "elapsed_s" in f:
+            known.update(f.dropna(subset=["elapsed_s"]).set_index("job_key")["elapsed_s"].to_dict())
+        todo = f[~f["job_key"].isin(known)]
+        if len(todo):
+            print(f"  re-timing {len(todo)} rejected jobs ...", flush=True)
+            args = [(Design(r.loading_target, r.d50, r.sigma_ln, r.aspect, r.order, r.preferred_angle),
+                     replace(self.cfg.layer, thickness=r.thickness, width=r.width, margin=r.margin),
+                     replace(self.cfg.geometry, min_gap=r.min_gap_setting), int(r.seed)) for r in todo.itertuples()]
+            ctx = __import__("multiprocessing").get_context("spawn")
+            from concurrent.futures import ProcessPoolExecutor
+
+            with ProcessPoolExecutor(self.workers, mp_context=ctx) as ex:
+                times = list(ex.map(_time_generation, args))
+            known.update(dict(zip(todo["job_key"], times)))
+        f["elapsed_s"] = f["job_key"].map(known)
+        pd.DataFrame({"job_key": list(known), "elapsed_s": list(known.values())}).to_parquet(cache, index=False)
+        f["method"] = f["tag"].str.replace(r"-\d+$", "", regex=True).map(
+            {"bo": "bayesian_optimisation", "bov2": "bo_v2", "random": "random_search", "sweep": "sweep"})
+        return f
+
     def compare_methods(self) -> dict:
         b = self.budget
         loop = self.load("search", "loop_rows.parquet")
@@ -223,6 +329,7 @@ class Study:
         ns = len(self.stress)
         out = {}
         curves = []
+        failed = self.failed_work()
         for label, rows in (("bayesian_optimisation", loop), ("random_search", rnd), ("sweep", sw)):
             obj = design_objectives(rows, n_stress=ns)
             cost = job_cost(rows)
@@ -255,12 +362,19 @@ class Study:
                 prefix = {"bayesian_optimisation": "bo-", "random_search": "random", "sweep": "sweep"}[label]
                 n_failed = int(f[f["tag"].str.startswith(prefix)]["design_id"].nunique())
             best = obj.nsmallest(1, "robust").iloc[0]
+            fw = failed[failed["method"] == label] if len(failed) else failed
+            failed_h = float(fw["elapsed_s"].sum() / 3600) if len(fw) else 0.0
+            overhead_h = (sum(h["train_time_s"] + h["acquisition_time_s"] for h in hist) / 3600
+                          if label == "bayesian_optimisation" else 0.0)
             out[label] = {
                 "n_designs_complete": int(obj.shape[0]),
                 "n_designs_requested": int(len(order)) + n_failed,
                 "n_designs_rejected": n_failed,
                 "solver_calls": int(cost["calls"].sum()),
                 "cpu_hours": float(cost["cpu_s"].sum() / 3600),
+                "failed_work_cpu_hours": failed_h,
+                "surrogate_overhead_hours": overhead_h,
+                "total_cpu_hours": float(cost["cpu_s"].sum() / 3600) + failed_h + overhead_h,
                 "best_design_id": best["design_id"],
                 "best_robust": float(best["robust"]),
                 "best_nominal_of_best": float(best["nominal"]),
@@ -646,6 +760,90 @@ class Study:
                                     "better_below": labs[j] if y0 > 0 else labs[i]})
         return out
 
+    def feasibility(self) -> dict:
+        """Separate generator limitations from geometric impossibility for the excluded cases.
+
+        For each case excluded after random sequential placement failed, the deterministic shelf
+        construction (geometry.construct_shelf) is tried with the same population and
+        orientations. Success proves that a valid arrangement exists; it is an ordered
+        arrangement, so it is used only as a feasibility statement plus one labelled
+        illustrative solve, never mixed with random realizations.
+        """
+        from .geometry import FAILURE_KINDS, construct_shelf, generate, validate
+        from .mesh import mesh_particles
+        from .solver import LayerModel
+
+        c = self._final_designs()
+        ro, med = c["recommended"], self._size_ladder(c["recommended"])["medium_particles_aligned"]
+        t0 = self.cfg.layer.thickness
+        thin = replace(self.cfg.layer, thickness=0.5 * t0, width=t0)
+        cases = {
+            "small rung 4.0 um (recommended shape)": (ro.with_(d50=4.0e-6), self.cfg.layer, self.cfg.geometry, [2000, 2001, 2002]),
+            "small rung 4.5 um (recommended shape)": (ro.with_(d50=4.5e-6), self.cfg.layer, self.cfg.geometry, [2000, 2001, 2002]),
+            "recommended at 50 um": (ro, thin, self.cfg.geometry, self.budget["confirm_seeds"][:3]),
+            "medium pair candidate at 50 um": (med, thin, self.cfg.geometry, self.budget["confirm_seeds"]),
+            "medium pair baseline at 50 um": (med.with_(order=0.0), thin, self.cfg.geometry, self.budget["confirm_seeds"]),
+            "recommended with 6 um margin": (ro, replace(self.cfg.layer, margin=6e-6), self.cfg.geometry,
+                                             self.budget.get("perturbation_seeds", [4000])),
+        }
+        out = {"failure_kinds": FAILURE_KINDS, "cases": {}}
+        for name, (d, lay, gs, seeds) in cases.items():
+            rec = {"rsa": {}, "shelf": {}}
+            for sd in seeds:
+                g = generate(d, lay, gs, sd)
+                rec["rsa"][str(sd)] = "ok" if g.ok else g.reason
+                h = construct_shelf(d, lay, gs, sd)
+                v = validate(h) if h.ok else {"valid": False}
+                rec["shelf"][str(sd)] = "valid" if (h.ok and v["valid"]) else (h.reason or "invalid")
+            n_rsa = sum(v == "ok" for v in rec["rsa"].values())
+            n_shelf = sum(v == "valid" for v in rec["shelf"].values())
+            geometric = all("cannot fit" in v or "truncated" in v for v in rec["shelf"].values()) and n_rsa == 0
+            if n_rsa == len(seeds):
+                verdict = "feasible with random placement for every realization"
+            elif n_rsa > 0 or n_shelf > 0:
+                verdict = (f"feasible: valid arrangements exist ({n_rsa}/{len(seeds)} by random placement, "
+                           f"{n_shelf}/{len(seeds)} by shelf construction); the remaining failures are generator "
+                           "limitations, not shown impossible")
+            elif geometric:
+                verdict = "impossible under the stated size rules (particles longer than the layer allows)"
+            else:
+                verdict = "not shown feasible by either strategy (neither proves impossibility)"
+            rec.update({"n_seeds": len(seeds), "rsa_ok": n_rsa, "shelf_ok": n_shelf, "verdict": verdict})
+            out["cases"][name] = rec
+        # illustrative solve of a constructed arrangement for the smallest excluded size
+        d = ro.with_(d50=4.0e-6)
+        ill = []
+        for sd in (2000, 2001, 2002):
+            h = construct_shelf(d, self.cfg.layer, self.cfg.geometry, sd)
+            if not (h.ok and validate(h)["valid"]):
+                continue
+            lm = LayerModel(mesh_particles(h, self.cfg.mesh))
+            for sc in (self.nominal, max(self.stress, key=lambda x: (x.r_interface, -x.k_filler_scale))):
+                ill.append({"seed": sd, "scenario": sc.name, "r_layer": lm.solve(params_for(self.material, sc)).r_layer})
+        out["illustrative_constructed_4um"] = {
+            "note": "ordered shelf arrangement; NOT comparable with randomly placed realizations",
+            "solves": ill}
+        # does conditioning on successful placement distort the realized orientation distribution?
+        acc = pd.concat([self.load("search", f) for f in ("loop_rows.parquet", "random_rows.parquet", "sweep_rows.parquet")])
+        acc = acc.drop_duplicates("job_key")
+        acc = acc[acc["aspect"] > 1.2]
+        dd = acc["geo_order_realized"] - acc["order"]
+        out["orientation_bias_check"] = {
+            "accepted_geometries": int(len(acc)),
+            "mean_realized_minus_target_order": float(dd.mean()),
+            "se": float(dd.std(ddof=1) / math.sqrt(len(dd))),
+            "geometries_needing_restarts": int((acc["geo_placement_restarts"] > 0).sum()),
+        }
+        fpath = self.out / "failures.parquet"
+        if fpath.exists():
+            from .geometry import classify_failure
+
+            f = pd.read_parquet(fpath)
+            f["failure_kind"] = [classify_failure(a, b) for a, b in zip(f["stage"], f["reason"])]
+            out["failure_counts_by_kind"] = f.groupby("failure_kind")["job_key"].nunique().to_dict()
+        _json(self.path("questions", "feasibility.json"), out)
+        return out
+
     def _size_ladder(self, ro: Design) -> dict[str, Design]:
         """Small / medium / large particles sharing the recommended width, shape and alignment.
 
@@ -994,6 +1192,18 @@ class Study:
 
     def manifest(self):
         write_manifest(self.out, self.config_dict())
+
+
+def _time_generation(args) -> float:
+    """CPU seconds to (re)run one geometry generation attempt."""
+    from .geometry import generate, validate
+
+    d, layer, gs, seed = args
+    t0 = time.perf_counter()
+    g = generate(d, layer, gs, seed)
+    if g.ok:
+        validate(g)
+    return time.perf_counter() - t0
 
 
 def _variance_reduction(df: pd.DataFrame, col: str, inputs: dict) -> dict:

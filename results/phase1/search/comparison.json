@@ -5,6 +5,9 @@
     "n_designs_rejected": 3,
     "solver_calls": 1155,
     "cpu_hours": 0.39815194671194376,
+    "failed_work_cpu_hours": 0.027435698616111115,
+    "surrogate_overhead_hours": 0.01080104629583338,
+    "total_cpu_hours": 0.43638869162388827,
     "best_design_id": "6d39bd4a6165",
     "best_robust": 0.00017573260662347105,
     "best_nominal_of_best": 0.00016741948400702308,
@@ -23,6 +26,9 @@
     "n_designs_rejected": 0,
     "solver_calls": 1200,
     "cpu_hours": 0.5360216459730563,
+    "failed_work_cpu_hours": 0.0,
+    "surrogate_overhead_hours": 0.0,
+    "total_cpu_hours": 0.5360216459730563,
     "best_design_id": "e362f2e70bfe",
     "best_robust": 0.0001929849893131747,
     "best_nominal_of_best": 0.00018405035865955196,
@@ -41,6 +47,9 @@
     "n_designs_rejected": 9,
     "solver_calls": 1080,
     "cpu_hours": 0.7114348958747235,
+    "failed_work_cpu_hours": 0.05595654516277782,
+    "surrogate_overhead_hours": 0.0,
+    "total_cpu_hours": 0.7673914410375013,
     "best_design_id": "0d99d341ddf6",
     "best_robust": 0.00017645250532481434,
     "best_nominal_of_best": 0.00016475569885157656,
@@ -55,6 +64,11 @@
   },
   "failures_by_tag_and_stage": {
     "bo/geometry": 9,
+    "q1-crossings/geometry": 12,
+    "q1q4/geometry": 15,
+    "q2-t50/geometry": 34,
+    "q3-margin_6um/geometry": 2,
+    "request-t60-phi0.25/geometry": 6,
     "sweep/geometry": 25
   }
 }

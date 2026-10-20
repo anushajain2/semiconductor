@@ -1,5 +1,5 @@
-material: /home/user/semiconductor/configs/materials/alumina_epoxy_dev.yaml
-scenarios: /home/user/semiconductor/configs/scenarios_phase1.yaml
+material: configs/materials/alumina_epoxy_dev.yaml
+scenarios: configs/scenarios_phase1.yaml
 design:
   loading: 0.3
   d50: 9.7980 um
