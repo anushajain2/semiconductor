@@ -1,0 +1,32 @@
+{
+  "code_version": "tcid-0.2.0@0d72490",
+  "clean_tree": true,
+  "verification_gates_pass": true,
+  "designs": {
+    "recommended": "4a51acc3a698",
+    "baseline_random_orientation": "b2b8ad263a90"
+  },
+  "seeds": [
+    6000,
+    6001,
+    6002
+  ],
+  "n_solves_recomputed": 30,
+  "n_failures": 0,
+  "max_rel_diff_vs_stored": 0.0,
+  "matches_stored_results": true,
+  "tolerance": 1e-09,
+  "wall_time_s": 86.1324828679999,
+  "environment": {
+    "python": "3.13.16",
+    "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-fem": "12.0.2",
+    "gmsh": "4.15.2",
+    "shapely": "2.2.0",
+    "scikit-learn": "1.9.1",
+    "pandas": "3.0.6"
+  },
+  "note": "stored results were produced from working trees recorded as dirty; this benchmark ties them to the tagged source by exact recomputation of a subset"
+}
